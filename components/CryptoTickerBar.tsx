@@ -26,14 +26,16 @@ const CryptoTickerBar: React.FC = () => {
       for (const id in data) {
         if (COIN_IDS_FOR_TICKER.includes(id)) {
           const coin = data[id];
-          formattedData.push({
-            id,
-            name: id.charAt(0).toUpperCase() + id.slice(1), // Simple name generation
-            symbol: id.toUpperCase(), // Simple symbol generation
-            usd: coin.usd,
-            usd_market_cap: coin.usd_market_cap,
-            usd_24h_change: coin.usd_24h_change,
-          });
+          if (coin && typeof coin.usd === 'number') {
+            formattedData.push({
+              id,
+              name: id.charAt(0).toUpperCase() + id.slice(1), // Simple name generation
+              symbol: id.toUpperCase(), // Simple symbol generation
+              usd: coin.usd,
+              usd_market_cap: coin.usd_market_cap ?? 0,
+              usd_24h_change: coin.usd_24h_change ?? 0,
+            });
+          }
         }
       }
 
@@ -73,21 +75,22 @@ const CryptoTickerBar: React.FC = () => {
     }
 
     const items = cryptoData.map((coin) => {
-      const change = coin.usd_24h_change;
+      const price = coin.usd ?? 0;
+      const change = coin.usd_24h_change ?? 0;
       const changeClass = change >= 0 ? 'text-green-400' : 'text-red-500'; // Tailwind classes for color
       const sign = change >= 0 ? '+' : '';
 
       if (coin.id === 'marketcap') {
         return (
           <span key={coin.id} className="inline-block text-white font-['Share_Tech_Mono'] mx-4 text-[0.9rem]">
-            {coin.name}: <span className="text-[#00ff41]">${(coin.usd / 1e12).toFixed(2)}T</span>
+            {coin.name}: <span className="text-[#00ff41]">${(price / 1e12).toFixed(2)}T</span>
           </span>
         );
       }
 
       return (
         <span key={coin.id} className="inline-block text-white font-['Share_Tech_Mono'] mx-4 text-[0.9rem]">
-          {coin.symbol}: <span className="text-[#00ff41]">${coin.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>{' '}
+          {coin.symbol}: <span className="text-[#00ff41]">${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>{' '}
           <span className={changeClass}>({sign}{change.toFixed(2)}%)</span>
         </span>
       );
