@@ -62,82 +62,133 @@ const ContactWindowContent: React.FC = () => {
   };
 
   return (
-    <div className="h-full terminal-style p-4 flex flex-col overflow-y-auto font-['Share_Tech_Mono'] text-[#00ff41] bg-[#0d0d0d]">
+    <div className="h-full terminal-style p-4 sm:p-5 flex flex-col overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent text-[13px] sm:text-sm">
       {formStatus === 'idle' && (
-        <div id="initiate-contact-view">
-          <p className="text-amber-400">[ESTABLISHING SECURE CONNECTION...]</p>
-          <p>&gt; Channel open.</p>
-          <p>&gt; Route: jihad@dawud.dev</p>
-          <br />
-          <p
-            className="terminal-option cursor-pointer hover:text-[#0d0d0d] hover:bg-[#00ff41]"
-            onClick={() => setFormStatus('composing')}
-          >
-            &gt; INITIATE EMAIL PROTOCOL
+        <div id="initiate-contact-view" className="space-y-2">
+          <p className="text-zinc-400 text-xs">Establishing Encrypted Relay</p>
+          <p className="text-zinc-200">&gt; Channel status: Ready</p>
+          <p className="text-zinc-200">
+            &gt; Endpoint: <span className="text-white font-medium">jihad@dawud.dev</span>
           </p>
+          <div className="pt-3">
+            <button
+              type="button"
+              className="terminal-option cursor-pointer bg-white text-zinc-950 hover:bg-zinc-200 font-medium px-4 py-2 rounded-lg text-xs transition-colors shadow-[0_4px_20px_rgba(255,255,255,0.16)]"
+              onClick={() => setFormStatus('composing')}
+            >
+              Initiate Email Protocol ›
+            </button>
+          </div>
         </div>
       )}
 
       {(formStatus === 'composing' || formStatus === 'submitting_data' || formStatus === 'error') && (
         <div id="contact-form-container" className="flex flex-col flex-grow">
-          <p className="text-amber-400 mb-2">[COMPOSING TRANSMISSION...]</p>
-          <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2 flex-grow">
-            <div>
-              <label htmlFor="name" className="block mb-1">NAME:</label>
-              <input
-                type="text" id="name" name="name" required value={name} onChange={(e) => setName(e.target.value)}
-                className="bg-black border border-[#00ff41] text-[#00ff41] p-2 w-full font-['Share_Tech_Mono'] focus:outline-none focus:shadow-[0_0_10px_#00ff41]"
-                disabled={formStatus === 'submitting_data'}
-              />
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-zinc-400 text-xs">Composing Transmission</p>
+            <button
+              type="button"
+              onClick={resetForm}
+              className="text-zinc-500 hover:text-zinc-200 text-xs transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
+          <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3 flex-grow">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="name" className="block mb-1 text-xs text-zinc-400">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="Dawud..."
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-white/[0.03] border border-white/[0.10] focus:border-white/30 focus:bg-white/[0.06] rounded-lg text-zinc-100 placeholder-zinc-600 px-3 py-2 w-full font-['JetBrains_Mono'] text-xs sm:text-sm focus:outline-none transition-colors"
+                  disabled={formStatus === 'submitting_data'}
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block mb-1 text-xs text-zinc-400">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  placeholder="you@domain.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white/[0.03] border border-white/[0.10] focus:border-white/30 focus:bg-white/[0.06] rounded-lg text-zinc-100 placeholder-zinc-600 px-3 py-2 w-full font-['JetBrains_Mono'] text-xs sm:text-sm focus:outline-none transition-colors"
+                  disabled={formStatus === 'submitting_data'}
+                />
+              </div>
             </div>
             <div>
-              <label htmlFor="email" className="block mb-1">EMAIL:</label>
+              <label htmlFor="phone" className="block mb-1 text-xs text-zinc-400">
+                Phone <span className="text-zinc-600">(Optional)</span>
+              </label>
               <input
-                type="email" id="email" name="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                className="bg-black border border-[#00ff41] text-[#00ff41] p-2 w-full font-['Share_Tech_Mono'] focus:outline-none focus:shadow-[0_0_10px_#00ff41]"
-                disabled={formStatus === 'submitting_data'}
-              />
-            </div>
-            <div>
-              <label htmlFor="phone" className="block mb-1">PHONE (OPTIONAL):</label>
-              <input
-                type="tel" id="phone" name="phone" value={phone} onChange={(e) => setPhone(e.target.value)}
-                className="bg-black border border-[#00ff41] text-[#00ff41] p-2 w-full font-['Share_Tech_Mono'] focus:outline-none focus:shadow-[0_0_10px_#00ff41]"
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="+1 (555) 000-0000"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="bg-white/[0.03] border border-white/[0.10] focus:border-white/30 focus:bg-white/[0.06] rounded-lg text-zinc-100 placeholder-zinc-600 px-3 py-2 w-full font-['JetBrains_Mono'] text-xs sm:text-sm focus:outline-none transition-colors"
                 disabled={formStatus === 'submitting_data'}
               />
             </div>
             <div className="flex flex-col">
-              <label htmlFor="message" className="block mb-1">MESSAGE:</label>
+              <label htmlFor="message" className="block mb-1 text-xs text-zinc-400">
+                Message
+              </label>
               <textarea
-                id="message" name="message" required value={message} onChange={(e) => setMessage(e.target.value)}
-                className="bg-black border border-[#00ff41] text-[#00ff41] p-2 w-full font-['Share_Tech_Mono'] flex-grow-0 min-h-[60px] focus:outline-none focus:shadow-[0_0_10px_#00ff41]"
+                id="message"
+                name="message"
+                required
+                placeholder="Enter your message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="bg-white/[0.03] border border-white/[0.10] focus:border-white/30 focus:bg-white/[0.06] rounded-lg text-zinc-100 placeholder-zinc-600 px-3 py-2 w-full font-['JetBrains_Mono'] text-xs sm:text-sm flex-grow-0 min-h-[76px] focus:outline-none transition-colors"
                 disabled={formStatus === 'submitting_data'}
               />
             </div>
-            <button
-              type="submit"
-              className="launch-button mt-4 bg-transparent border border-[#00ff41] text-[#00ff41] px-3 py-1 cursor-pointer font-['Share_Tech_Mono'] hover:bg-[#00ff41] hover:text-[#0d0d0d] disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={formStatus === 'submitting_data'}
-            >
-              {formStatus === 'submitting_data' ? 'Sending...' : 'Send Transmission'}
-            </button>
-             {formStatus === 'error' && errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+            <div className="pt-1 flex items-center gap-3">
+              <button
+                type="submit"
+                className="bg-white text-zinc-950 hover:bg-zinc-200 px-4 py-2 rounded-lg cursor-pointer font-['JetBrains_Mono'] text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-[0_4px_16px_rgba(255,255,255,0.16)]"
+                disabled={formStatus === 'submitting_data'}
+              >
+                {formStatus === 'submitting_data' ? 'Transmitting...' : 'Send Transmission'}
+              </button>
+              {formStatus === 'error' && errorMessage && (
+                <p className="text-rose-400 text-xs">{errorMessage}</p>
+              )}
+            </div>
           </form>
         </div>
       )}
 
       {formStatus === 'submitted' && (
-        <div id="confirmation-message">
-          <p className="text-green-400">[TRANSMISSION SENT]</p>
-          <p>&gt; Your message is now traversing the digital ether.</p>
-          <p>&gt; Stand by for response.</p>
-          <br />
-          <p
-            className="terminal-option cursor-pointer hover:text-[#0d0d0d] hover:bg-[#00ff41]"
-            onClick={resetForm}
-          >
-            [&lt; New Transmission]
-          </p>
+        <div id="confirmation-message" className="space-y-2">
+          <p className="text-emerald-400 text-xs font-medium">Transmission Delivered</p>
+          <p className="text-zinc-200">&gt; Your message is now traversing the digital ether.</p>
+          <p className="text-zinc-400">&gt; Stand by for response.</p>
+          <div className="pt-3">
+            <button
+              type="button"
+              className="terminal-option cursor-pointer bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.12] text-zinc-100 px-3.5 py-1.5 rounded-lg text-xs transition-colors"
+              onClick={resetForm}
+            >
+              ‹ New Transmission
+            </button>
+          </div>
         </div>
       )}
     </div>

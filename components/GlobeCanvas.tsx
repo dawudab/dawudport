@@ -40,21 +40,69 @@ const GlobeCanvas: React.FC = () => {
     renderer.setPixelRatio(window.devicePixelRatio);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, currentContainer.clientWidth / currentContainer.clientHeight, 0.1, 1000);
-    camera.position.z = 2.5;
+    const camera = new THREE.PerspectiveCamera(70, currentContainer.clientWidth / currentContainer.clientHeight, 0.1, 1000);
+    camera.position.z = 2.55;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
     const globeGroup = new THREE.Group();
-    const wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff41, wireframe: true, transparent: true, opacity: 0.15 });
-    const globeMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), wireframeMaterial);
+
+    // Inner dark occlusion core for depth perception
+    const coreGeometry = new THREE.SphereGeometry(0.96, 32, 32);
+    const coreMaterial = new THREE.MeshBasicMaterial({
+      color: 0x050507,
+      transparent: true,
+      opacity: 0.72,
+    });
+    const coreMesh = new THREE.Mesh(coreGeometry, coreMaterial);
+    globeGroup.add(coreMesh);
+
+    // Primary Bittensor-style fine silver wireframe sphere
+    const sphereGeometry = new THREE.SphereGeometry(1, 28, 20);
+    const wireframeMaterial = new THREE.MeshBasicMaterial({
+      color: 0xe4e4e7,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.11,
+    });
+    const globeMesh = new THREE.Mesh(sphereGeometry, wireframeMaterial);
     globeGroup.add(globeMesh);
+
+    // Outer neural subnet icosahedron lattice
+    const outerLatticeGeometry = new THREE.IcosahedronGeometry(1.12, 2);
+    const outerLatticeMaterial = new THREE.MeshBasicMaterial({
+      color: 0xa1a1aa,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.05,
+    });
+    const outerLatticeMesh = new THREE.Mesh(outerLatticeGeometry, outerLatticeMaterial);
+    globeGroup.add(outerLatticeMesh);
+
+    // Subtle glowing vertex nodes on the subnet mesh
+    const nodesMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.022,
+      transparent: true,
+      opacity: 0.55,
+    });
+    const nodesPoints = new THREE.Points(outerLatticeGeometry, nodesMaterial);
+    globeGroup.add(nodesPoints);
+
+    // Slight axial tilt for architectural poise
+    globeGroup.rotation.z = 0.18;
+    globeGroup.rotation.x = 0.12;
+
     scene.add(globeGroup);
 
     let animationFrameId: number;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      globeGroup.rotation.y += 0.0005;
+      globeMesh.rotation.y += 0.0006;
+      outerLatticeMesh.rotation.y -= 0.00035;
+      outerLatticeMesh.rotation.x += 0.00015;
+      nodesPoints.rotation.y -= 0.00035;
+      nodesPoints.rotation.x += 0.00015;
       renderer.render(scene, camera);
     };
     animate();
@@ -74,8 +122,13 @@ const GlobeCanvas: React.FC = () => {
       cancelAnimationFrame(animationFrameId);
       resizeObserver.unobserve(currentContainer);
       renderer.dispose();
+      coreMaterial.dispose();
+      coreGeometry.dispose();
       wireframeMaterial.dispose();
-      globeMesh.geometry.dispose();
+      sphereGeometry.dispose();
+      outerLatticeMaterial.dispose();
+      outerLatticeGeometry.dispose();
+      nodesMaterial.dispose();
     };
   }, []); // Empty dependency array means this runs once on mount and cleans up on unmount
 
@@ -83,14 +136,20 @@ const GlobeCanvas: React.FC = () => {
     <div ref={containerRef} className="absolute top-0 left-0 w-full h-full z-[1]">
       <canvas ref={canvasRef} className="w-full h-full" />
       <div
-        className="absolute bottom-[calc(30px+0.5rem)] left-1/2 -translate-x-1/2 w-full px-4
-                   flex justify-center items-center flex-wrap gap-x-3 gap-y-1 z-[2] pointer-events-none"
+        className="absolute bottom-[calc(38px+0.75rem)] left-1/2 -translate-x-1/2 w-full px-4
+                   flex justify-center items-center flex-wrap gap-x-4 gap-y-1 z-[2] pointer-events-none"
         aria-label="World Times Under Globe"
       >
-        {worldClocks.map(city => (
-          <span key={city.name} className="text-xs font-['Share_Tech_Mono'] text-green-400/80 whitespace-nowrap">
-            <span className="text-white/80">{city.name.toUpperCase()}:</span> {city.currentTime}
-          </span>
+        {worldClocks.map((city, idx) => (
+          <React.Fragment key={city.name}>
+            <span className="text-[11px] font-['JetBrains_Mono'] tabular-nums tracking-tight text-zinc-300/80 whitespace-nowrap">
+              <span className="text-zinc-500">{city.name.toUpperCase()}</span>{' '}
+              <span className="text-zinc-200">{city.currentTime}</span>
+            </span>
+            {idx < worldClocks.length - 1 && (
+              <span className="text-zinc-700 text-[10px] hidden sm:inline" aria-hidden="true">·</span>
+            )}
+          </React.Fragment>
         ))}
       </div>
     </div>

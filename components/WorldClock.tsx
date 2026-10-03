@@ -29,8 +29,9 @@ const WorldClock: React.FC = () => {
   }, []);
 
   const renderClockItems = (instance: string) => clockData.map(cityTime => (
-    <span key={`${instance}-${cityTime.name}`} className="mr-5 text-xs text-green-400">
-      <span className="text-amber-400">{cityTime.name.toUpperCase()}:</span> {cityTime.time}
+    <span key={`${instance}-${cityTime.name}`} className="mr-6 text-xs font-['JetBrains_Mono'] tabular-nums tracking-tight text-zinc-200">
+      <span className="text-zinc-500">{cityTime.name.toUpperCase()}</span>{' '}
+      <span className="text-zinc-100">{cityTime.time}</span>
     </span>
   ));
 

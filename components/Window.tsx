@@ -6,6 +6,7 @@ interface WindowProps {
   title: string;
   children: React.ReactNode;
   isVisible: boolean;
+  isActive?: boolean;
   zIndex: number;
   initialPosition: { top: number; left: number }; // For mobile: top is px, left is vw units. For desktop: top/left are px units.
   initialSize: { width: string; height: string };
@@ -19,6 +20,7 @@ const WindowComponent: React.FC<WindowProps> = ({
   title,
   children,
   isVisible,
+  isActive = false,
   zIndex,
   initialPosition,
   initialSize,
@@ -109,41 +111,73 @@ const WindowComponent: React.FC<WindowProps> = ({
     <div
       ref={windowRef}
       id={id}
-      className="bg-black border-2 border-[#00ff41] rounded-lg shadow-[0_0_15px_rgba(0,255,65,0.5)] flex flex-col min-w-0 min-h-[200px] overflow-hidden pointer-events-auto"
+      className={`rounded-2xl backdrop-blur-2xl bg-[#09090d]/78 border transition-colors duration-150 flex flex-col min-w-0 min-h-[200px] overflow-hidden pointer-events-auto ${
+        isActive
+          ? 'border-white/[0.18] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.20),0_30px_80px_rgba(0,0,0,0.82)]'
+          : 'border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.10),0_20px_50px_rgba(0,0,0,0.65)]'
+      }`}
       style={{
         ...windowStyle,
         width: isMobile ? 'calc(100% - 16px)' : windowStyle.width,
-        height: isMobile ? 'calc(100vh - 120px)' : windowStyle.height,
-        maxWidth: isMobile ? 'calc(100% - 16px)' : '1200px',
+        height: isMobile ? 'calc(100vh - 116px)' : windowStyle.height,
+        maxWidth: isMobile ? 'calc(100% - 16px)' : '1120px',
         left: isMobile ? '8px' : windowStyle.left,
-        top: isMobile ? '60px' : windowStyle.top, // Positioned below the top bar
+        top: isMobile ? '52px' : windowStyle.top,
         position: isMobile ? 'fixed' : 'absolute',
-        maxHeight: isMobile ? 'calc(100vh - 120px)' : 'none',
+        maxHeight: isMobile ? 'calc(100vh - 116px)' : 'none',
       }}
       onClick={onFocus}
     >
       <div
-        className={`bg-black text-white p-2 font-['Orbitron'] font-bold flex justify-between items-center select-none ${isMobile ? '' : 'cursor-move'}`}
+        className={`bg-white/[0.03] border-b border-white/[0.08] px-4 py-2.5 flex justify-between items-center select-none ${
+          isMobile ? '' : 'cursor-move'
+        }`}
         onMouseDown={handleMouseDown}
       >
-        <span>{title}</span>
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              className="group w-3 h-3 rounded-full bg-rose-500/80 hover:bg-rose-500 border border-white/10 flex items-center justify-center cursor-pointer transition-colors focus:outline-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              aria-label="Close window"
+            >
+              <span className="text-[8px] leading-none text-black/80 opacity-0 group-hover:opacity-100 font-bold">✕</span>
+            </button>
+            <span className="w-3 h-3 rounded-full bg-white/[0.10] border border-white/[0.08]" />
+            <span className="w-3 h-3 rounded-full bg-white/[0.10] border border-white/[0.08]" />
+          </div>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-zinc-500 font-['JetBrains_Mono'] text-xs select-none">τ</span>
+            <span className="font-['JetBrains_Mono'] text-xs sm:text-[13px] font-medium tracking-tight text-zinc-200 truncate">
+              {title}
+            </span>
+          </div>
+        </div>
         <button
-          className="bg-[#ff5f56] w-[15px] h-[15px] rounded-full border border-black cursor-pointer focus:outline-none"
+          type="button"
+          className="text-zinc-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.10] border border-white/[0.08] rounded-md px-2 py-0.5 text-[11px] font-['JetBrains_Mono'] cursor-pointer transition-colors focus:outline-none whitespace-nowrap"
           onClick={(e) => {
             e.stopPropagation();
             onClose();
           }}
-          aria-label="Close window"
-        />
+          aria-label="Close terminal window"
+        >
+          ESC
+        </button>
       </div>
-      <div className="flex-1 overflow-y-auto bg-black" style={{
-        WebkitOverflowScrolling: 'touch',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        WebkitTransform: 'translateZ(0)' // Force hardware acceleration on iOS
-      }}>
-        <div className="p-2">
-          {children}
-        </div>
+      <div
+        className="flex-1 overflow-y-auto bg-transparent terminal-style"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          WebkitTransform: 'translateZ(0)',
+        }}
+      >
+        <div className="h-full">{children}</div>
       </div>
     </div>
   );

@@ -90,7 +90,7 @@ export const CITIES_FOR_CLOCK: CityTime[] = [
   { name: 'Sydney', timeZone: 'Australia/Sydney' },
 ];
 
-export const COIN_IDS_FOR_TICKER: string[] = ['bitcoin', 'ethereum', 'solana', 'cosmos', 'arbitrum', 'cardano', 'uniswap', 'matic-network', 'binancecoin'];
+export const COIN_IDS_FOR_TICKER: string[] = ['bitcoin', 'ethereum', 'bittensor', 'solana', 'cosmos', 'arbitrum', 'cardano', 'uniswap', 'binancecoin'];
 
 export const NAME_ENGLISH = "Dawud Jihad Abdullah";
 export const NAME_ARABIC = "داود جهاد عبدالله";

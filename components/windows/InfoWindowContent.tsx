@@ -84,57 +84,96 @@ const InfoWindowContent: React.FC = () => {
   }, [typedLines]);
 
   return (
-    <div ref={contentRef} className="h-full terminal-style p-4 overflow-y-auto font-['Share_Tech_Mono'] text-[#00ff41] bg-[#0d0d0d]">
+    <div
+      ref={contentRef}
+      className="h-full terminal-style p-4 sm:p-5 overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent text-[13px] sm:text-sm"
+    >
       {!selectedCategory ? (
         <>
           <div className="mb-4">
             <div className="flex gap-4 items-center mb-4">
               <Avatar src="https://i.imgur.com/v8iI51q.jpeg" alt="Profile Picture" />
-              <div>
-                <h3 className="font-['Cairo'] text-lg sm:text-xl text-white">داود بن داود الجهاد عبدالله</h3>
-                <h4 className="font-['Orbitron'] text-base sm:text-lg">Dawud Bin Dawud Al Jihad Abduallah</h4>
+              <div className="min-w-0">
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-semibold text-white">
+                  داود بن داود الجهاد عبدالله
+                </h3>
+                <h4 className="font-['Plus_Jakarta_Sans'] text-sm sm:text-base font-medium text-zinc-300 tracking-tight">
+                  Dawud Bin Dawud Al Jihad Abduallah
+                </h4>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 text-sm">
-              <p>AGE: <span className="text-white">{age !== null ? age : 'Calculating...'}</span></p>
-              <p>DOB (G): <span className="text-white">08/30/1996</span></p>
-              <p>LOCATION: <span className="text-white">USA</span></p>
-              <p>DOB (H): <span className="text-white">{hijriDOB}</span></p>
-              <p>STATUS: <span className="text-green-400">ONLINE</span></p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs tabular-nums border-t border-white/[0.08] pt-3">
+              <p className="text-zinc-400">
+                Age <span className="text-zinc-600 mx-1">·</span>{' '}
+                <span className="text-zinc-100">{age !== null ? age : 'Calculating...'}</span>
+              </p>
+              <p className="text-zinc-400">
+                DOB (G) <span className="text-zinc-600 mx-1">·</span>{' '}
+                <span className="text-zinc-100">08/30/1996</span>
+              </p>
+              <p className="text-zinc-400">
+                Location <span className="text-zinc-600 mx-1">·</span>{' '}
+                <span className="text-zinc-100">USA</span>
+              </p>
+              <p className="text-zinc-400">
+                DOB (H) <span className="text-zinc-600 mx-1">·</span>{' '}
+                <span className="text-zinc-100">{hijriDOB}</span>
+              </p>
+              <p className="text-zinc-400">
+                Status <span className="text-zinc-600 mx-1">·</span>{' '}
+                <span className="text-emerald-400 font-medium">Online</span>
+              </p>
             </div>
           </div>
-          <hr className="border-green-400/20 my-2" />
+          <hr className="border-white/[0.08] my-3" />
           <div>
-            <p className="text-amber-400">[SELECT DATASTREAM]</p>
-            {(Object.keys(ResumeCategory) as Array<keyof typeof ResumeCategory>).map(key => (
-              <p
-                key={ResumeCategory[key]}
-                className="terminal-option cursor-pointer hover:text-[#0d0d0d] hover:bg-[#00ff41]"
-                onClick={() => handleShowInfo(ResumeCategory[key])}
-              >
-                [&gt; {ResumeCategory[key].charAt(0).toUpperCase() + ResumeCategory[key].slice(1).replace(/([A-Z])/g, ' $1')} Experience]
-              </p>
-            ))}
+            <p className="text-xs font-medium text-zinc-400 mb-2.5">Select Datastream</p>
+            <div className="space-y-1.5">
+              {(Object.keys(ResumeCategory) as Array<keyof typeof ResumeCategory>).map((key) => {
+                const label =
+                  ResumeCategory[key].charAt(0).toUpperCase() +
+                  ResumeCategory[key].slice(1).replace(/([A-Z])/g, ' $1');
+                return (
+                  <div
+                    key={ResumeCategory[key]}
+                    className="terminal-option cursor-pointer py-2 px-3 rounded-lg bg-white/[0.03] hover:bg-white/[0.09] border border-white/[0.08] hover:border-white/20 text-zinc-200 hover:text-white transition-all duration-150 flex items-center justify-between"
+                    onClick={() => handleShowInfo(ResumeCategory[key])}
+                  >
+                    <span>{label} Experience</span>
+                    <span className="text-zinc-500">›</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </>
       ) : (
-        <div>
+        <div className="space-y-1.5">
           {typedLines.map((line, index) => (
-            <p key={index} className={line.startsWith("[Accessing") ? "text-amber-400" : ""}>
+            <p
+              key={index}
+              className={
+                line.startsWith('[Accessing')
+                  ? 'text-zinc-400 text-xs mb-2 pb-1.5 border-b border-white/[0.08]'
+                  : 'text-zinc-100 leading-relaxed'
+              }
+            >
               {line}
-              {isTyping && index === typedLines.length - 1 && <span className="inline-block w-2.5 h-5 bg-[#00ff41] blinking-cursor-anim ml-1"></span>}
+              {isTyping && index === typedLines.length - 1 && (
+                <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
+              )}
             </p>
           ))}
           {!isTyping && (
-            <>
-              <br />
-              <p
-                className="terminal-option cursor-pointer hover:text-[#0d0d0d] hover:bg-[#00ff41]"
+            <div className="pt-3">
+              <button
+                type="button"
+                className="terminal-option cursor-pointer bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.12] text-zinc-100 px-3.5 py-1.5 rounded-lg text-xs transition-colors"
                 onClick={resetInfoView}
               >
-                [&lt; Back]
-              </p>
-            </>
+                ‹ Back to Overview
+              </button>
+            </div>
           )}
         </div>
       )}

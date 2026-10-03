@@ -173,30 +173,29 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow,
   return (
     <div
       ref={contentRef}
-      className="h-full terminal-style p-2 sm:p-4 overflow-y-auto font-['Share_Tech_Mono'] text-[#00ff41] bg-[#0d0d0d] text-shadow shadow-[#00ff41]/30"
+      className="h-full terminal-style p-4 sm:p-5 overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent text-[13px] sm:text-sm leading-relaxed"
       style={{
         height: '100%',
         overflowY: 'auto',
         WebkitOverflowScrolling: 'touch',
         wordBreak: 'break-word',
         boxSizing: 'border-box',
-        padding: '1rem'
       }}
     >
       {outputLines.map((line) => (
-        <div key={line.id} className="mb-1">
+        <div key={line.id} className="mb-2">
           {line.id === 'loading' ? (
-            <div className="flex items-center">
+            <div className="flex items-center text-zinc-300">
               <span>{line.text}</span>
               {isLoading && (
                 <span className="ml-2 inline-flex space-x-1">
                   {[1, 2, 3].map((dot) => (
                     <span
                       key={dot}
-                      className="inline-block w-1.5 h-1.5 bg-[#00ff41] rounded-full animate-bounce"
+                      className="inline-block w-1.5 h-1.5 bg-zinc-200 rounded-full animate-bounce"
                       style={{
                         animationDelay: `${dot * 0.15}s`,
-                        animationDuration: '1s'
+                        animationDuration: '1s',
                       }}
                     />
                   ))}
@@ -205,36 +204,63 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow,
             </div>
           ) : (
             <>
-              {line.type === 'user' && <p className="text-gray-400 italic break-words">{line.text}</p>}
-              {line.type === 'bot' && <p className="break-words">{line.text}{isTyping && outputLines[outputLines.length-1].id === line.id && <span className="inline-block w-2.5 h-5 bg-[#00ff41] blinking-cursor-anim ml-1 shadow-[0_0_5px_#00ff41,0_0_10px_#00ff41]"></span>}</p>}
-              {line.type === 'prompt' && <p className="cursor-pointer break-words" onClick={proceedWithEnter}>{line.text} <span className="inline-block w-2.5 h-5 bg-[#00ff41] blinking-cursor-anim ml-1 shadow-[0_0_5px_#00ff41,0_0_10px_#00ff41]"></span></p>}
+              {line.type === 'user' && (
+                <p className="text-zinc-400 break-words py-0.5">{line.text}</p>
+              )}
+              {line.type === 'bot' && (
+                <p className="text-zinc-100 break-words">
+                  {line.text}
+                  {isTyping && outputLines[outputLines.length - 1].id === line.id && (
+                    <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
+                  )}
+                </p>
+              )}
+              {line.type === 'prompt' && (
+                <p className="cursor-pointer text-zinc-300 break-words" onClick={proceedWithEnter}>
+                  {line.text}{' '}
+                  <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
+                </p>
+              )}
               {line.type === 'options' && line.options && (
-                <div className="mt-2 space-y-1">
-                  {line.options.map((opt, index) => (
-                    <p
-                      key={index}
-                      className={`terminal-option cursor-pointer
-                        py-1 px-2 -mx-2 rounded
-                        hover:text-[#0d0d0d] hover:bg-[#00ff41] hover:shadow-none
-                        active:bg-[#00cc33] active:scale-95 transition-transform
-                        ${index === selectedOptionIndex ? 'text-[#0d0d0d] bg-[#00ff41] shadow-none' : ''}`}
-                      onClick={() => handleOptionSelect(opt)}
-                    >
-                      [{index === selectedOptionIndex ? '*' : '>'} {opt.text}]
-                    </p>
-                  ))}
+                <div className="mt-3 space-y-1.5">
+                  {line.options.map((opt, index) => {
+                    const isSelected = index === selectedOptionIndex;
+                    return (
+                      <div
+                        key={index}
+                        className={`terminal-option cursor-pointer py-2 px-3 rounded-lg border transition-all duration-150 flex items-center gap-2 ${
+                          isSelected
+                            ? 'bg-white text-zinc-950 border-white font-medium shadow-[0_4px_20px_rgba(255,255,255,0.18)]'
+                            : 'bg-white/[0.03] text-zinc-200 border-white/[0.08] hover:bg-white/[0.09] hover:border-white/20 hover:text-white'
+                        }`}
+                        onClick={() => handleOptionSelect(opt)}
+                      >
+                        <span className={isSelected ? 'text-zinc-950 font-semibold' : 'text-zinc-500'}>
+                          {isSelected ? '›' : '·'}
+                        </span>
+                        <span>{opt.text}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </>
           )}
         </div>
       ))}
-      {isTyping && outputLines.length > 0 && outputLines[outputLines.length-1].type !== 'bot' && !isLoading && (
-        <span className="inline-block w-2.5 h-5 bg-[#00ff41] blinking-cursor-anim ml-1 shadow-[0_0_5px_#00ff41,0_0_10px_#00ff41]"></span>
+      {isTyping && outputLines.length > 0 && outputLines[outputLines.length - 1].type !== 'bot' && !isLoading && (
+        <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
       )}
-      {!isTyping && !waitingForEnter && currentOptions.length === 0 && outputLines.length > 0 && outputLines[outputLines.length-1].type !== 'options' && !isLoading && (
-        <span className="inline-block w-2.5 h-5 bg-[#00ff41] blinking-cursor-anim ml-1 shadow-[0_0_5px_#00ff41,0_0_10px_#00ff41]"></span>
-      )}
+      {!isTyping &&
+        !waitingForEnter &&
+        currentOptions.length === 0 &&
+        outputLines.length > 0 &&
+        outputLines[outputLines.length - 1].type !== 'options' &&
+        !isLoading && (
+          <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
+        )}
     </div>
   );
-};export default ReadmeWindowContent;
+};
+
+export default ReadmeWindowContent;

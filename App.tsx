@@ -16,10 +16,10 @@ import {
   CONTACT_WINDOW_DESKTOP_SIZE
 } from './constants';
 
-const APP_HEADER_HEIGHT = 30; // px for CryptoTickerBar
-const APP_FOOTER_HEIGHT = 30; // px for StatusBar
-const DESKTOP_WINDOW_MARGIN_TOP_FROM_HEADER = 15; // px, min space between header and window top
-const DESKTOP_WINDOW_STAGGER_OFFSET = 25; // px, for staggering multiple windows
+const APP_HEADER_HEIGHT = 36; // px for CryptoTickerBar
+const APP_FOOTER_HEIGHT = 38; // px for StatusBar
+const DESKTOP_WINDOW_MARGIN_TOP_FROM_HEADER = 18; // px, min space between header and window top
+const DESKTOP_WINDOW_STAGGER_OFFSET = 26; // px, for staggering multiple windows
 
 const windowDefinitionOrder: WindowId[] = [WindowId.README, WindowId.PROJECTS, WindowId.CONTACT, WindowId.INFO];
 const windowTitles: Record<WindowId, string> = {
@@ -199,10 +199,30 @@ const App: React.FC = () => {
   };
 
   return (
-    <div id="os-environment" className="fixed top-0 left-0 w-screen h-[100dvh] bg-black text-gray-800 overflow-hidden font-['Roboto']">
+    <div
+      id="os-environment"
+      className="fixed top-0 left-0 w-screen h-[100dvh] bg-[#050507] text-zinc-100 overflow-hidden font-['Plus_Jakarta_Sans'] select-none"
+    >
+      {/* Subtle Bittensor radial ambient light & micro-grid backdrop */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.055) 0%, rgba(148, 163, 184, 0.02) 38%, rgba(5, 5, 7, 0) 72%)',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.035]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.6) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+      />
+
       <GlobeCanvas />
       <CryptoTickerBar />
-      <DesktopIconsContainer onIconClick={openWindow} />
+      <DesktopIconsContainer onIconClick={openWindow} activeWindowId={activeWindowId} />
 
       <div id="windows-container" className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none">
         {(Object.keys(windows) as WindowId[]).map(id => {
@@ -214,13 +234,13 @@ const App: React.FC = () => {
               id={win.id}
               title={win.title}
               isVisible={win.isVisible}
+              isActive={activeWindowId === win.id}
               zIndex={win.zIndex}
               initialPosition={win.position}
               initialSize={win.size}
               isMobile={isMobile}
               onClose={() => closeWindow(win.id)}
               onFocus={() => focusWindow(win.id)}
-
             >
               {getWindowContent(win.id)}
             </WindowComponent>
