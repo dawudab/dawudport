@@ -91,40 +91,49 @@ const CryptoTickerBar: React.FC = () => {
       );
     }
 
-    const items = cryptoData.map((coin) => {
-      const price = coin.usd ?? 0;
-      const change = coin.usd_24h_change ?? 0;
-      const changeClass = change >= 0 ? 'text-emerald-400' : 'text-rose-400';
-      const sign = change >= 0 ? '+' : '';
+    const renderTickerList = (copyIndex: number) => {
+      return cryptoData.map((coin) => {
+        const price = coin.usd ?? 0;
+        const change = coin.usd_24h_change ?? 0;
+        const changeClass = change >= 0 ? 'text-emerald-400' : 'text-rose-400';
+        const sign = change >= 0 ? '+' : '';
 
-      if (coin.id === 'marketcap') {
+        if (coin.id === 'marketcap') {
+          return (
+            <span
+              key={`marketcap-${copyIndex}`}
+              className="inline-flex items-center gap-2 font-['JetBrains_Mono'] tabular-nums mx-5 text-xs tracking-tight"
+            >
+              <span className="text-zinc-400">{coin.name}</span>
+              <span className="text-zinc-100 font-medium">${(price / 1e12).toFixed(2)}T</span>
+              <span className="text-zinc-700 ml-3" aria-hidden="true">/</span>
+            </span>
+          );
+        }
+
+        const isTao = coin.id === 'bittensor';
+
         return (
-          <span key={coin.id} className="inline-flex items-center gap-2 font-['JetBrains_Mono'] tabular-nums mx-5 text-xs tracking-tight">
-            <span className="text-zinc-400">{coin.name}</span>
-            <span className="text-zinc-100 font-medium">${(price / 1e12).toFixed(2)}T</span>
-            <span className="text-zinc-700 ml-3" aria-hidden="true">/</span>
+          <span
+            key={`${coin.id}-${copyIndex}`}
+            className="inline-flex items-center gap-1.5 font-['JetBrains_Mono'] tabular-nums mx-5 text-xs tracking-tight"
+          >
+            <span className={isTao ? 'text-white font-semibold' : 'text-zinc-400'}>
+              {isTao ? 'τ TAO' : coin.symbol}
+            </span>
+            <span className="text-zinc-100 font-medium">
+              ${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+            <span className={`${changeClass} text-[11px]`}>
+              {sign}{change.toFixed(2)}%
+            </span>
+            <span className="text-zinc-800 ml-3" aria-hidden="true">/</span>
           </span>
         );
-      }
+      });
+    };
 
-      const isTao = coin.id === 'bittensor';
-
-      return (
-        <span key={coin.id} className="inline-flex items-center gap-1.5 font-['JetBrains_Mono'] tabular-nums mx-5 text-xs tracking-tight">
-          <span className={isTao ? 'text-white font-semibold' : 'text-zinc-400'}>
-            {isTao ? 'τ TAO' : coin.symbol}
-          </span>
-          <span className="text-zinc-100 font-medium">
-            ${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-          <span className={`${changeClass} text-[11px]`}>
-            {sign}{change.toFixed(2)}%
-          </span>
-          <span className="text-zinc-800 ml-3" aria-hidden="true">/</span>
-        </span>
-      );
-    });
-    return [...items, ...items];
+    return [...renderTickerList(0), ...renderTickerList(1)];
   };
 
   return (

@@ -73,10 +73,15 @@ export const RESUME_DATA: ResumeData = {
 };
 
 export const PROJECTS_DATA: Project[] = [
-  { id: 'tlj', name: "The Language Journal", statusText: "STATUS_ALPHA", statusColor: 'green', launchUrl: 'https://www.tlj.app', detailsInitiallyOpen: true },
-  { id: 'halal-dex', name: "Halal Dex", statusText: "STATUS_IN_DEVELOPMENT", statusColor: 'yellow' },
-  { id: 'halal-swap', name: "HalalSwap", statusText: "STATUS_IN_DEVELOPMENT", statusColor: 'yellow' },
-  { id: 'icontracts', name: "iContracts", statusText: "STATUS_DEMO", statusColor: 'green', launchUrl: 'https://studio--icontractchain.us-central1.hosted.app/' },
+  {
+    id: 'nouakchott-emap',
+    name: 'Nouakchott E-Map',
+    statusText: 'STATUS_LIVE',
+    statusColor: 'green',
+    launchUrl: 'https://emernouk.ai.studio/',
+    detailsInitiallyOpen: true,
+    description: 'Emergency mapping, location, and infrastructure intelligence platform for Nouakchott, Mauritania.'
+  },
 ];
 
 export const CITIES_FOR_CLOCK: CityTime[] = [
@@ -92,6 +97,11 @@ export const CITIES_FOR_CLOCK: CityTime[] = [
 
 export const COIN_IDS_FOR_TICKER: string[] = ['bitcoin', 'ethereum', 'bittensor', 'solana', 'cosmos', 'arbitrum', 'cardano', 'uniswap', 'binancecoin'];
 
-export const NAME_ENGLISH = "Dawud Jihad Abdullah";
-export const NAME_ARABIC = "داود جهاد عبدالله";
-export const NAME_MOBILE = "DAWUD J. ABDULLAH";
+export const NAME_ENGLISH = "Dawud";
+export const NAME_ARABIC = "داود";
+export const NAME_MOBILE = "DAWUD";
+
+export const CONTACT_EMAIL = "jihad@dawud.dev";
+export const CONTACT_WHATSAPP = "+12026502773";
+export const CONTACT_WHATSAPP_DISPLAY = "+1 (202) 650-2773";
+export const CONTACT_WHATSAPP_URL = "https://wa.me/12026502773";

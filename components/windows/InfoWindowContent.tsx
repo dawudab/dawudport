@@ -1,16 +1,10 @@
-
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Avatar from '../Avatar';
-import { ResumeCategory } from '../../types';
-import { RESUME_DATA } from '@/constants'; // Changed from ../../constants
+import { CONTACT_EMAIL, CONTACT_WHATSAPP_DISPLAY, CONTACT_WHATSAPP_URL } from '@/constants';
 
 const InfoWindowContent: React.FC = () => {
   const [age, setAge] = useState<number | null>(null);
-  const [hijriDOB, setHijriDOB] = useState<string>('16/4/1417'); // Fallback
-  const [selectedCategory, setSelectedCategory] = useState<ResumeCategory | null>(null);
-  const [typedLines, setTypedLines] = useState<string[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const [hijriDOB, setHijriDOB] = useState<string>('16/4/1417');
 
   useEffect(() => {
     const calculateAge = (birthDate: string): number => {
@@ -34,149 +28,116 @@ const InfoWindowContent: React.FC = () => {
       });
       setHijriDOB(hijriFormatter.format(dob));
     } catch (e) {
-      console.error("Could not calculate Hijri date.", e);
-      // Fallback is already set
+      console.error('Could not calculate Hijri date.', e);
     }
   }, []);
-
-  const typeCategoryData = useCallback(async (category: ResumeCategory) => {
-    const data = RESUME_DATA[category];
-    if (!data) return;
-
-    setIsTyping(true);
-    setTypedLines([`[Accessing records for: ${category.toUpperCase()}]`]);
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    for (const line of data) {
-      let currentLineText = '> ';
-      setTypedLines(prev => [...prev, currentLineText]);
-      for (let i = 0; i < line.length; i++) {
-        currentLineText += line[i];
-         setTypedLines(prev => {
-            const newLines = [...prev];
-            newLines[newLines.length -1] = currentLineText;
-            return newLines;
-        });
-        if (contentRef.current) contentRef.current.scrollTop = contentRef.current.scrollHeight;
-        await new Promise(resolve => setTimeout(resolve, 15));
-      }
-    }
-    setIsTyping(false);
-  }, []);
-
-
-  const handleShowInfo = (category: ResumeCategory) => {
-    setSelectedCategory(category);
-    setTypedLines([]);
-    typeCategoryData(category);
-  };
-
-  const resetInfoView = () => {
-    setSelectedCategory(null);
-    setTypedLines([]);
-    setIsTyping(false);
-  };
-
-  useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
-    }
-  }, [typedLines]);
 
   return (
-    <div
-      ref={contentRef}
-      className="h-full terminal-style p-4 sm:p-5 overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent text-[13px] sm:text-sm"
-    >
-      {!selectedCategory ? (
-        <>
-          <div className="mb-4">
-            <div className="flex gap-4 items-center mb-4">
-              <Avatar src="https://i.imgur.com/v8iI51q.jpeg" alt="Profile Picture" />
-              <div className="min-w-0">
-                <h3 className="font-['Cairo'] text-lg sm:text-xl font-semibold text-white">
-                  داود بن داود الجهاد عبدالله
-                </h3>
-                <h4 className="font-['Plus_Jakarta_Sans'] text-sm sm:text-base font-medium text-zinc-300 tracking-tight">
-                  Dawud Bin Dawud Al Jihad Abduallah
-                </h4>
-              </div>
+    <div className="h-full terminal-style p-4 sm:p-6 overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent text-[13px] sm:text-sm">
+      {/* Header Profile Section */}
+      <div className="border-b border-white/[0.08] pb-5 mb-5">
+        <div className="flex gap-4 items-center">
+          <Avatar src="https://i.imgur.com/v8iI51q.jpeg" alt="Dawud Profile" />
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs text-zinc-400 font-['Cairo']">داود</span>
+              <span className="text-zinc-600">·</span>
+              <span className="text-[11px] text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                ONLINE
+              </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs tabular-nums border-t border-white/[0.08] pt-3">
-              <p className="text-zinc-400">
-                Age <span className="text-zinc-600 mx-1">·</span>{' '}
-                <span className="text-zinc-100">{age !== null ? age : 'Calculating...'}</span>
-              </p>
-              <p className="text-zinc-400">
-                DOB (G) <span className="text-zinc-600 mx-1">·</span>{' '}
-                <span className="text-zinc-100">08/30/1996</span>
-              </p>
-              <p className="text-zinc-400">
-                Location <span className="text-zinc-600 mx-1">·</span>{' '}
-                <span className="text-zinc-100">USA</span>
-              </p>
-              <p className="text-zinc-400">
-                DOB (H) <span className="text-zinc-600 mx-1">·</span>{' '}
-                <span className="text-zinc-100">{hijriDOB}</span>
-              </p>
-              <p className="text-zinc-400">
-                Status <span className="text-zinc-600 mx-1">·</span>{' '}
-                <span className="text-emerald-400 font-medium">Online</span>
-              </p>
-            </div>
-          </div>
-          <hr className="border-white/[0.08] my-3" />
-          <div>
-            <p className="text-xs font-medium text-zinc-400 mb-2.5">Select Datastream</p>
-            <div className="space-y-1.5">
-              {(Object.keys(ResumeCategory) as Array<keyof typeof ResumeCategory>).map((key) => {
-                const label =
-                  ResumeCategory[key].charAt(0).toUpperCase() +
-                  ResumeCategory[key].slice(1).replace(/([A-Z])/g, ' $1');
-                return (
-                  <div
-                    key={ResumeCategory[key]}
-                    className="terminal-option cursor-pointer py-2 px-3 rounded-lg bg-white/[0.03] hover:bg-white/[0.09] border border-white/[0.08] hover:border-white/20 text-zinc-200 hover:text-white transition-all duration-150 flex items-center justify-between"
-                    onClick={() => handleShowInfo(ResumeCategory[key])}
-                  >
-                    <span>{label} Experience</span>
-                    <span className="text-zinc-500">›</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="space-y-1.5">
-          {typedLines.map((line, index) => (
-            <p
-              key={index}
-              className={
-                line.startsWith('[Accessing')
-                  ? 'text-zinc-400 text-xs mb-2 pb-1.5 border-b border-white/[0.08]'
-                  : 'text-zinc-100 leading-relaxed'
-              }
-            >
-              {line}
-              {isTyping && index === typedLines.length - 1 && (
-                <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
-              )}
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Dawud
+            </h2>
+            <p className="text-xs text-zinc-400 mt-0.5 font-['Plus_Jakarta_Sans']">
+              Developer · Web3 & Decentralized Systems · AI Applications
             </p>
-          ))}
-          {!isTyping && (
-            <div className="pt-3">
-              <button
-                type="button"
-                className="terminal-option cursor-pointer bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.12] text-zinc-100 px-3.5 py-1.5 rounded-lg text-xs transition-colors"
-                onClick={resetInfoView}
-              >
-                ‹ Back to Overview
-              </button>
-            </div>
-          )}
+          </div>
         </div>
-      )}
+
+        {/* Quick Metadata Matrix */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs tabular-nums mt-4 pt-4 border-t border-white/[0.06]">
+          <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+            <span className="text-[11px] text-zinc-500 block">AGE</span>
+            <span className="text-zinc-100 font-medium">{age !== null ? age : '28'}</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+            <span className="text-[11px] text-zinc-500 block">LOCATION</span>
+            <span className="text-zinc-100 font-medium">USA</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+            <span className="text-[11px] text-zinc-500 block">DOB (G)</span>
+            <span className="text-zinc-100 font-medium">08/30/1996</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+            <span className="text-[11px] text-zinc-500 block">DOB (H)</span>
+            <span className="text-zinc-100 font-medium truncate block">{hijriDOB}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Simple Bio */}
+      <div className="space-y-4 mb-6">
+        <div>
+          <h3 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2">
+            // Bio & Mission
+          </h3>
+          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-zinc-300 space-y-3 leading-relaxed">
+            <p>
+              I am Dawud — a Muslim, American developer, and builder passionate about decentralized infrastructure, blockchain integration, and emerging AI technologies.
+            </p>
+            <p>
+              My goal is to engineer open, transparent digital systems that empower individuals rather than exploit them, creating genuine economic opportunities aligned with strong ethical and Shariah principles.
+            </p>
+          </div>
+        </div>
+
+        {/* Core Pillars */}
+        <div>
+          <h3 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2">
+            // Core Focus Areas
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+              <span className="text-white font-medium text-xs block mb-1">01. Web3 & Blockchain</span>
+              <p className="text-xs text-zinc-400">Decentralized networks, smart contracts, and digital sovereignty.</p>
+            </div>
+            <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+              <span className="text-white font-medium text-xs block mb-1">02. Modern Applications</span>
+              <p className="text-xs text-zinc-400">Interactive GIS mapping, real-time telemetry, and resilient web apps.</p>
+            </div>
+            <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+              <span className="text-white font-medium text-xs block mb-1">03. Ethical Tech</span>
+              <p className="text-xs text-zinc-400">Shariah-aligned systems that prioritize fairness, utility, and human progress.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Links */}
+        <div>
+          <h3 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2">
+            // Direct Channels
+          </h3>
+          <div className="flex flex-wrap gap-2.5">
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="inline-flex items-center gap-2 bg-white text-zinc-950 hover:bg-zinc-200 px-3.5 py-2 rounded-lg text-xs font-medium transition-colors"
+            >
+              <span>Email: {CONTACT_EMAIL}</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+            <a
+              href={CONTACT_WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-3.5 py-2 rounded-lg text-xs font-medium transition-colors"
+            >
+              <span>WhatsApp: {CONTACT_WHATSAPP_DISPLAY}</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

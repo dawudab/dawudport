@@ -1,179 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo, useLayoutEffect } from 'react';
-import { ConversationTree, TerminalOption, WindowId } from '../../types';
-import { CONVERSATION_TREE } from '@/constants'; // Changed from ../../constants
+import React from 'react';
+import { WindowId } from '../../types';
+import { CONTACT_EMAIL, CONTACT_WHATSAPP_DISPLAY, CONTACT_WHATSAPP_URL } from '@/constants';
 
 interface ReadmeWindowContentProps {
   onOpenWindow: (windowId: WindowId) => void;
-  isActive: boolean; // To control keyboard listener
+  isActive: boolean;
 }
 
-interface OutputLine {
-  id: string;
-  text: string;
-  type: 'bot' | 'user' | 'prompt' | 'options';
-  options?: TerminalOption[];
-}
-
-const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow, isActive }) => {
-  const [outputLines, setOutputLines] = useState<OutputLine[]>([]);
-
-  const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [currentOptions, setCurrentOptions] = useState<TerminalOption[]>([]);
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number>(0);
-  const [waitingForEnter, setWaitingForEnter] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const contentRef = useRef<HTMLDivElement>(null);
-  const timeoutIdsRef = useRef<NodeJS.Timeout[]>([]);
-  const uniqueIdCounter = useRef(0);
-
-  const startReadmeRef = useRef<() => void>(() => {});
-
-    const dynamicConversationTree: ConversationTree = useMemo(() => ({
-    ...CONVERSATION_TREE,
-    final_options: {
-      ...CONVERSATION_TREE.final_options,
-      options: [
-        { text: "Replay Transmission", action: () => startReadmeRef.current() },
-        { text: "Send Transmission", action: () => onOpenWindow(WindowId.CONTACT) },
-        { text: "View Active Bounties", action: () => onOpenWindow(WindowId.PROJECTS) }
-      ]
-    }
-  }), [onOpenWindow]);
-
-  const scrollToBottom = () => {
-    if (contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
-    }
-  };
-
-  const addLine = (line: Omit<OutputLine, 'id'>) => {
-    setOutputLines(prev => [...prev, { ...line, id: `line-${uniqueIdCounter.current++}` }]);
-    scrollToBottom();
-  };
-
-  const typeNodeText = useCallback(async (nodeKey: string) => {
-    const node = dynamicConversationTree[nodeKey];
-    if (!node) return;
-
-    setIsTyping(true);
-    for (const line of node.text) {
-      let currentLineText = '> ';
-      addLine({ text: currentLineText, type: 'bot' });
-      for (let i = 0; i < line.length; i++) {
-        currentLineText += line[i];
-        setOutputLines(prev => prev.map(l => l.id === `line-${uniqueIdCounter.current -1}` ? {...l, text: currentLineText} : l));
-        scrollToBottom();
-        await new Promise(resolve => timeoutIdsRef.current.push(setTimeout(resolve, 20)));
-      }
-    }
-    setIsTyping(false);
-
-    setCurrentOptions(node.options || []);
-    setSelectedOptionIndex(0);
-
-    if (node.options && node.options.length === 1 && node.options[0].text === "Continue...") {
-      setWaitingForEnter(true);
-      addLine({ text: "[Press Enter to continue...]", type: 'prompt' });
-    } else if (node.options && node.options.length > 0) {
-      addLine({ text: "", type: 'options', options: node.options });
-    }
-  }, [dynamicConversationTree]);
-
-  const startReadme = useCallback(() => {
-    setOutputLines([]);
-    uniqueIdCounter.current = 0;
-
-    setIsTyping(false);
-    setWaitingForEnter(false);
-    setCurrentOptions([]);
-    setSelectedOptionIndex(0);
-    typeNodeText('start');
-  }, [typeNodeText]);
-
-  useLayoutEffect(() => {
-    startReadmeRef.current = startReadme;
-  }, [startReadme]);
-
-  // Initial loading effect with delay
-  useEffect(() => {
-    // Add loading message
-    setOutputLines([{ id: 'loading', text: '🛰️ Incoming Transmission', type: 'bot' }]);
-
-    const loadingTimer = setTimeout(() => {
-      setIsLoading(false);
-      startReadmeRef.current = startReadme;
-      startReadme();
-    }, 2000); // 2 second delay before starting
-
-    return () => {
-      clearTimeout(loadingTimer);
-      timeoutIdsRef.current.forEach(clearTimeout);
-      timeoutIdsRef.current = [];
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on mount, with cleanup
-
-  const handleOptionSelect = useCallback((option: TerminalOption) => {
-    if (isTyping) return;
-
-    // Remove previous options/prompt
-    setOutputLines(prev => prev.filter(l => l.type !== 'options' && l.type !== 'prompt'));
-
-    addLine({ text: `< ${option.text}`, type: 'user' });
-    setCurrentOptions([]);
-    setWaitingForEnter(false);
-
-    if (option.action) {
-      option.action();
-      // Potentially reset or allow further interaction after action
-    } else if (option.next) {
-
-      timeoutIdsRef.current.push(setTimeout(() => typeNodeText(option.next!), 300));
-
-    }
-  }, [isTyping, typeNodeText]);
-
-
-  const proceedWithEnter = useCallback(() => {
-    if (waitingForEnter && currentOptions.length > 0) {
-      handleOptionSelect(currentOptions[0]);
-    }
-  }, [waitingForEnter, currentOptions, handleOptionSelect]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isActive || isTyping) return;
-
-      if (waitingForEnter && e.key === 'Enter') {
-        e.preventDefault();
-        proceedWithEnter();
-      } else if (currentOptions.length > 0 && !waitingForEnter) {
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          setSelectedOptionIndex(prev => (prev + 1) % currentOptions.length);
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          setSelectedOptionIndex(prev => (prev - 1 + currentOptions.length) % currentOptions.length);
-        } else if (e.key === 'Enter') {
-          e.preventDefault();
-          if (currentOptions[selectedOptionIndex]) {
-            handleOptionSelect(currentOptions[selectedOptionIndex]);
-          }
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isActive, isTyping, waitingForEnter, currentOptions, selectedOptionIndex, proceedWithEnter, handleOptionSelect]);
-
-  useEffect(scrollToBottom, [outputLines]);
-
+const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow }) => {
   return (
     <div
-      ref={contentRef}
-      className="h-full terminal-style p-4 sm:p-5 overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent text-[13px] sm:text-sm leading-relaxed"
+      className="h-full terminal-style p-4 sm:p-6 overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent text-[13px] sm:text-sm leading-relaxed"
       style={{
         height: '100%',
         overflowY: 'auto',
@@ -182,83 +19,124 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow,
         boxSizing: 'border-box',
       }}
     >
-      {outputLines.map((line) => (
-        <div key={line.id} className="mb-2">
-          {line.id === 'loading' ? (
-            <div className="flex items-center text-zinc-300">
-              <span>{line.text}</span>
-              {isLoading && (
-                <span className="ml-2 inline-flex space-x-1">
-                  {[1, 2, 3].map((dot) => (
-                    <span
-                      key={dot}
-                      className="inline-block w-1.5 h-1.5 bg-zinc-200 rounded-full animate-bounce"
-                      style={{
-                        animationDelay: `${dot * 0.15}s`,
-                        animationDuration: '1s',
-                      }}
-                    />
-                  ))}
-                </span>
-              )}
-            </div>
-          ) : (
-            <>
-              {line.type === 'user' && (
-                <p className="text-zinc-400 break-words py-0.5">{line.text}</p>
-              )}
-              {line.type === 'bot' && (
-                <p className="text-zinc-100 break-words">
-                  {line.text}
-                  {isTyping && outputLines[outputLines.length - 1].id === line.id && (
-                    <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
-                  )}
-                </p>
-              )}
-              {line.type === 'prompt' && (
-                <p className="cursor-pointer text-zinc-300 break-words" onClick={proceedWithEnter}>
-                  {line.text}{' '}
-                  <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
-                </p>
-              )}
-              {line.type === 'options' && line.options && (
-                <div className="mt-3 space-y-1.5">
-                  {line.options.map((opt, index) => {
-                    const isSelected = index === selectedOptionIndex;
-                    return (
-                      <div
-                        key={index}
-                        className={`terminal-option cursor-pointer py-2 px-3 rounded-lg border transition-all duration-150 flex items-center gap-2 ${
-                          isSelected
-                            ? 'bg-white text-zinc-950 border-white font-medium shadow-[0_4px_20px_rgba(255,255,255,0.18)]'
-                            : 'bg-white/[0.03] text-zinc-200 border-white/[0.08] hover:bg-white/[0.09] hover:border-white/20 hover:text-white'
-                        }`}
-                        onClick={() => handleOptionSelect(opt)}
-                      >
-                        <span className={isSelected ? 'text-zinc-950 font-semibold' : 'text-zinc-500'}>
-                          {isSelected ? '›' : '·'}
-                        </span>
-                        <span>{opt.text}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </>
-          )}
+      {/* Terminal Header Banner */}
+      <div className="border-b border-white/[0.08] pb-4 mb-5">
+        <div className="flex items-center gap-2 text-xs text-zinc-400 mb-1.5">
+          <span className="text-emerald-400">●</span>
+          <span>SYSTEM_INIT // READY</span>
+          <span className="text-zinc-600">·</span>
+          <span>DAWUD_PORTAL v2.4</span>
         </div>
-      ))}
-      {isTyping && outputLines.length > 0 && outputLines[outputLines.length - 1].type !== 'bot' && !isLoading && (
-        <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
-      )}
-      {!isTyping &&
-        !waitingForEnter &&
-        currentOptions.length === 0 &&
-        outputLines.length > 0 &&
-        outputLines[outputLines.length - 1].type !== 'options' &&
-        !isLoading && (
-          <span className="inline-block w-2 h-4 bg-white blinking-cursor-anim ml-1.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
-        )}
+        <h1 className="text-lg sm:text-xl font-semibold text-white tracking-tight">
+          Assalāmu ʿAlaikum — Welcome to my Console
+        </h1>
+        <p className="text-xs text-zinc-400 mt-1">
+          Personal landing console, digital proof-of-work, and system directory.
+        </p>
+      </div>
+
+      {/* About Dawud */}
+      <div className="space-y-4 mb-6">
+        <div>
+          <h2 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2 flex items-center gap-2">
+            <span className="text-zinc-600">//</span> 01. About Me
+          </h2>
+          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-zinc-300 space-y-2.5">
+            <p>
+              I am <span className="text-white font-medium">Dawud</span> — a developer, tech strategist, and builder based in the United States.
+            </p>
+            <p>
+              My focus is on integrating decentralized networks, blockchain architecture, and artificial intelligence into practical, real-world systems. I believe in engineering open technology that empowers individuals, creates authentic financial opportunity, and aligns with high ethical principles.
+            </p>
+          </div>
+        </div>
+
+        {/* About This Website */}
+        <div>
+          <h2 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2 flex items-center gap-2">
+            <span className="text-zinc-600">//</span> 02. About This Website
+          </h2>
+          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-zinc-300 space-y-2">
+            <p>
+              This website is an interactive desktop operating system modeled after modern Bittensor terminal architecture and iOS frosted glass aesthetics.
+            </p>
+            <p className="text-xs text-zinc-400">
+              Key subsystems: live multi-currency crypto oracle ticker, 3D neural subnet lattice globe, global time matrix, and encrypted transmission channels.
+            </p>
+          </div>
+        </div>
+
+        {/* Quick Directory / Actions */}
+        <div>
+          <h2 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2 flex items-center gap-2">
+            <span className="text-zinc-600">//</span> 03. Quick Launch Directory
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => onOpenWindow(WindowId.PROJECTS)}
+              className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-150 group cursor-pointer"
+            >
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-zinc-400 group-hover:text-white font-medium">./projects</span>
+                <span className="text-emerald-400 text-[11px]">ACTIVE</span>
+              </div>
+              <p className="text-xs text-zinc-300 group-hover:text-white">
+                View Nouakchott E-Map & deployment status ›
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onOpenWindow(WindowId.CONTACT)}
+              className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-150 group cursor-pointer"
+            >
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-zinc-400 group-hover:text-white font-medium">./contact</span>
+                <span className="text-zinc-400 text-[11px]">RELAY</span>
+              </div>
+              <p className="text-xs text-zinc-300 group-hover:text-white">
+                Send transmission via Email or WhatsApp ›
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onOpenWindow(WindowId.INFO)}
+              className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-150 group cursor-pointer"
+            >
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-zinc-400 group-hover:text-white font-medium">./dawud --info</span>
+                <span className="text-zinc-400 text-[11px]">BIO</span>
+              </div>
+              <p className="text-xs text-zinc-300 group-hover:text-white">
+                View bio profile, location, and details ›
+              </p>
+            </button>
+
+            <a
+              href={CONTACT_WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-emerald-500/10 border border-white/[0.08] hover:border-emerald-500/30 transition-all duration-150 group cursor-pointer"
+            >
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-zinc-400 group-hover:text-emerald-400 font-medium">WhatsApp</span>
+                <span className="text-emerald-400 text-[11px]">DIRECT</span>
+              </div>
+              <p className="text-xs text-zinc-300 group-hover:text-white">
+                {CONTACT_WHATSAPP_DISPLAY} ↗
+              </p>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer signoff */}
+      <div className="pt-3 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
+        <span>If you resonate or have projects to build — reach out.</span>
+        <span className="text-zinc-400 font-medium">jihad@dawud.dev</span>
+      </div>
     </div>
   );
 };

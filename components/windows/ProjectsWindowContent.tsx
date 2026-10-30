@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Project } from '../../types';
-import { PROJECTS_DATA } from '@/constants'; // Changed from ../../constants
+import { PROJECTS_DATA } from '@/constants';
 import PulsingLight from '../PulsingLight';
 
 interface ProjectItemProps {
@@ -10,51 +9,58 @@ interface ProjectItemProps {
 
 const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
   const [isOpen, setIsOpen] = useState(project.detailsInitiallyOpen || false);
-
   const readableStatus = project.statusText.replace('STATUS_', '').replace(/_/g, ' ');
 
   return (
-    <div className="border-b border-white/[0.06] last:border-b-0 py-2.5">
-      <div
-        className={`flex items-center justify-between gap-3 ${
-          project.launchUrl ? 'cursor-pointer group' : ''
-        }`}
-        onClick={() => project.launchUrl && setIsOpen(!isOpen)}
-      >
-        <div className="flex items-center gap-3 min-w-0">
+    <div className="border border-white/[0.08] bg-white/[0.02] rounded-xl p-4 sm:p-5 transition-all duration-150">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
+        <div className="flex items-center gap-3">
           <PulsingLight color={project.statusColor} />
-          <p className="font-['JetBrains_Mono'] text-sm text-zinc-100 group-hover:text-white transition-colors truncate">
+          <h3 className="font-['JetBrains_Mono'] text-base font-semibold text-white">
             {project.name}
-          </p>
+          </h3>
           <span className="text-zinc-600 text-xs" aria-hidden="true">·</span>
           <span
-            className={`font-['JetBrains_Mono'] text-xs tracking-tight ${
-              project.statusColor === 'green' ? 'text-emerald-400' : 'text-amber-400'
+            className={`font-['JetBrains_Mono'] text-xs font-medium px-2 py-0.5 rounded ${
+              project.statusColor === 'green'
+                ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
+                : 'text-amber-400 bg-amber-500/10 border border-amber-500/20'
             }`}
           >
             {readableStatus}
           </span>
         </div>
+
         {project.launchUrl && (
-          <span className="text-zinc-500 group-hover:text-zinc-200 font-['JetBrains_Mono'] text-xs transition-colors">
-            {isOpen ? '−' : '+'}
-          </span>
-        )}
-      </div>
-      {project.launchUrl && isOpen && (
-        <div className="pl-5 mt-2.5 flex items-center gap-3">
           <a
             href={project.launchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 bg-white text-zinc-950 hover:bg-zinc-200 px-3.5 py-1.5 rounded-lg text-xs font-['JetBrains_Mono'] font-medium transition-colors whitespace-nowrap shadow-[0_4px_16px_rgba(255,255,255,0.15)]"
+            className="inline-flex items-center justify-center gap-2 bg-white text-zinc-950 hover:bg-zinc-200 px-4 py-2 rounded-lg text-xs font-['JetBrains_Mono'] font-medium transition-all shadow-[0_4px_16px_rgba(255,255,255,0.15)] whitespace-nowrap self-start sm:self-auto"
           >
-            <span>Launch Application</span>
+            <span>Launch Live App</span>
             <span aria-hidden="true">↗</span>
           </a>
-          <span className="text-zinc-500 font-['JetBrains_Mono'] text-xs truncate">
+        )}
+      </div>
+
+      {project.description && (
+        <p className="text-xs text-zinc-400 font-['JetBrains_Mono'] leading-relaxed mb-3">
+          {project.description}
+        </p>
+      )}
+
+      {project.launchUrl && (
+        <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06] text-xs font-['JetBrains_Mono'] text-zinc-500">
+          <span>Endpoint:</span>
+          <a
+            href={project.launchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-zinc-400 hover:text-white underline underline-offset-2 truncate"
+          >
             {project.launchUrl}
-          </span>
+          </a>
         </div>
       )}
     </div>
@@ -62,36 +68,36 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
 };
 
 const ProjectsWindowContent: React.FC = () => {
-  const activeBounties = PROJECTS_DATA.filter(p => p.statusColor === 'green');
-  const queuedTransmissions = PROJECTS_DATA.filter(p => p.statusColor === 'yellow');
-
   return (
-    <div className="h-full terminal-style p-4 sm:p-5 overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent">
-      {activeBounties.length > 0 && (
-        <div className="mb-6">
-          <p className="text-xs font-medium text-zinc-400 tracking-wider mb-2">
-            Active Deployments
-          </p>
-          <div className="divide-y divide-white/[0.06]">
-            {activeBounties.map(project => (
-              <ProjectItem key={project.id} project={project} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {queuedTransmissions.length > 0 && (
+    <div className="h-full terminal-style p-4 sm:p-6 overflow-y-auto font-['JetBrains_Mono'] text-zinc-100 bg-transparent">
+      {/* Header */}
+      <div className="border-b border-white/[0.08] pb-3 mb-5 flex items-center justify-between">
         <div>
-          <p className="text-xs font-medium text-zinc-400 tracking-wider mb-2">
-            Queued Subnets & Protocols
-          </p>
-          <div className="divide-y divide-white/[0.06]">
-            {queuedTransmissions.map(project => (
-              <ProjectItem key={project.id} project={project} />
-            ))}
-          </div>
+          <p className="text-xs text-zinc-400">// DEPLOYMENTS & LIVE SYSTEMS</p>
+          <h2 className="text-sm sm:text-base font-semibold text-white">Featured Project</h2>
         </div>
-      )}
+        <span className="text-xs font-['JetBrains_Mono'] text-zinc-500">
+          1 Active Deployment
+        </span>
+      </div>
+
+      {/* Projects List */}
+      <div className="space-y-4 mb-6">
+        {PROJECTS_DATA.map((project) => (
+          <ProjectItem key={project.id} project={project} />
+        ))}
+      </div>
+
+      {/* Staging notice for new upcoming projects */}
+      <div className="p-4 rounded-xl border border-dashed border-white/[0.12] bg-white/[0.01] text-xs text-zinc-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <p className="text-zinc-300 font-medium mb-0.5">Additional Projects in Staging</p>
+          <p className="text-zinc-500">New Web3, mapping, and decentralized protocol repositories will be indexed here shortly.</p>
+        </div>
+        <span className="text-[11px] font-['JetBrains_Mono'] text-zinc-500 whitespace-nowrap bg-white/[0.04] px-2.5 py-1 rounded">
+          QUEUE_STANDBY
+        </span>
+      </div>
     </div>
   );
 };

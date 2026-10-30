@@ -66,7 +66,7 @@ const StatusBar: React.FC<StatusBarProps> = ({ onOpenWindow }) => {
   return (
     <div className="fixed bottom-0 left-0 w-full h-[38px] bg-zinc-950/60 backdrop-blur-2xl z-[100] border-t border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07)] flex justify-between items-center">
       {/* Desktop Name Button */}
-      <div className="hidden md:flex items-center px-4 min-w-[260px]">
+      <div className="hidden md:flex items-center px-4 shrink-0">
         <button
           type="button"
           className={`inline-flex items-center gap-2 text-xs font-medium text-zinc-100 cursor-pointer bg-white/[0.05] hover:bg-white/[0.11] border border-white/[0.12] hover:border-white/25 px-3 py-1 rounded-lg transition-all duration-150 whitespace-nowrap shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] ${nameButtonFont}`}
