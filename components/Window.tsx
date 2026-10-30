@@ -8,7 +8,7 @@ interface WindowProps {
   isVisible: boolean;
   isActive?: boolean;
   zIndex: number;
-  initialPosition: { top: number; left: number }; // For mobile: top is px, left is vw units. For desktop: top/left are px units.
+  initialPosition: { top: number; left: number };
   initialSize: { width: string; height: string };
   onClose: () => void;
   onFocus: () => void;
@@ -28,24 +28,20 @@ const WindowComponent: React.FC<WindowProps> = ({
   onFocus,
   isMobile,
 }) => {
-  // 'position' state stores pixel values for top/left, primarily for desktop dragging.
-  // For mobile, 'initialPosition' is used directly for styling, with 'left' interpreted as 'vw'.
   const [position, setPosition] = useState(initialPosition);
   const [isDragging, setIsDragging] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const windowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // When initialPosition changes (e.g., due to layout recalculation on resize or mobile toggle),
-    // update the internal 'position' state. This is mainly relevant for desktop.
     setPosition(initialPosition);
   }, [initialPosition]);
 
-
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobile || !windowRef.current) return; // Disable dragging on mobile
-    if ((e.target as HTMLElement).closest('input, textarea, button, select, .terminal-option')) {
-        return;
+    if (isMobile || isMaximized || !windowRef.current) return;
+    if ((e.target as HTMLElement).closest('input, textarea, button, select, a, .terminal-option')) {
+      return;
     }
 
     setIsDragging(true);
@@ -58,20 +54,23 @@ const WindowComponent: React.FC<WindowProps> = ({
     e.preventDefault();
   };
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (isMobile || !isDragging || !windowRef.current) return;
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isMobile || !isDragging || !windowRef.current || isMaximized) return;
 
-    let newTop = e.clientY - dragStartPos.current.y;
-    let newLeft = e.clientX - dragStartPos.current.x;
+      let newTop = e.clientY - dragStartPos.current.y;
+      let newLeft = e.clientX - dragStartPos.current.x;
 
-    const parentRect = windowRef.current.parentElement?.getBoundingClientRect();
-    if (parentRect) {
+      const parentRect = windowRef.current.parentElement?.getBoundingClientRect();
+      if (parentRect) {
         newTop = Math.max(0, Math.min(newTop, parentRect.height - windowRef.current.offsetHeight));
         newLeft = Math.max(0, Math.min(newLeft, parentRect.width - windowRef.current.offsetWidth));
-    }
+      }
 
-    setPosition({ top: newTop, left: newLeft });
-  }, [isDragging, isMobile]);
+      setPosition({ top: newTop, left: newLeft });
+    },
+    [isDragging, isMobile, isMaximized]
+  );
 
   const handleMouseUp = useCallback(() => {
     if (isMobile) return;
@@ -96,79 +95,142 @@ const WindowComponent: React.FC<WindowProps> = ({
     return null;
   }
 
-  // Style calculation based on mobile/desktop and source of position values
   const windowStyle: React.CSSProperties = {
-    top: `${isMobile ? initialPosition.top : position.top}px`, // Mobile uses initialPosition.top (px), Desktop uses internal state (px)
-    left: isMobile ? `${initialPosition.left}vw` : `${position.left}px`, // Mobile uses initialPosition.left (vw), Desktop uses internal state (px)
-    width: initialSize.width,
-    height: initialSize.height,
+    top: isMaximized
+      ? '44px'
+      : `${isMobile ? initialPosition.top : position.top}px`,
+    left: isMaximized
+      ? '12px'
+      : isMobile
+      ? `${initialPosition.left}vw`
+      : `${position.left}px`,
+    width: isMaximized ? 'calc(100vw - 24px)' : initialSize.width,
+    height: isMaximized ? 'calc(100vh - 88px)' : initialSize.height,
     zIndex,
-    position: 'absolute',
+    position: isMobile || isMaximized ? 'fixed' : 'absolute',
   };
-
 
   return (
     <div
       ref={windowRef}
       id={id}
-      className={`rounded-2xl backdrop-blur-2xl bg-[#09090d]/78 border transition-colors duration-150 flex flex-col min-w-0 min-h-[200px] overflow-hidden pointer-events-auto ${
+      className={`rounded-2xl backdrop-blur-[36px] bg-gradient-to-b from-white/[0.09] via-zinc-950/78 to-zinc-950/88 transition-all duration-200 flex flex-col min-w-0 min-h-[220px] overflow-hidden pointer-events-auto ${
         isActive
-          ? 'border-white/[0.18] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.20),0_30px_80px_rgba(0,0,0,0.82)]'
-          : 'border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.10),0_20px_50px_rgba(0,0,0,0.65)]'
+          ? 'border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),inset_0_0_24px_rgba(255,255,255,0.02),0_32px_90px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)]'
+          : 'border border-white/12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.22),0_20px_50px_rgba(0,0,0,0.65)] opacity-95'
       }`}
       style={{
         ...windowStyle,
-        width: isMobile ? 'calc(100% - 16px)' : windowStyle.width,
-        height: isMobile ? 'calc(100vh - 116px)' : windowStyle.height,
-        maxWidth: isMobile ? 'calc(100% - 16px)' : '1120px',
-        left: isMobile ? '8px' : windowStyle.left,
-        top: isMobile ? '52px' : windowStyle.top,
-        position: isMobile ? 'fixed' : 'absolute',
-        maxHeight: isMobile ? 'calc(100vh - 116px)' : 'none',
+        width: isMaximized
+          ? 'calc(100vw - 24px)'
+          : isMobile
+          ? 'calc(100% - 16px)'
+          : windowStyle.width,
+        height: isMaximized
+          ? 'calc(100vh - 88px)'
+          : isMobile
+          ? 'calc(100vh - 116px)'
+          : windowStyle.height,
+        maxWidth: isMaximized
+          ? 'none'
+          : isMobile
+          ? 'calc(100% - 16px)'
+          : '1160px',
+        left: isMaximized ? '12px' : isMobile ? '8px' : windowStyle.left,
+        top: isMaximized ? '44px' : isMobile ? '52px' : windowStyle.top,
+        maxHeight: isMaximized
+          ? 'calc(100vh - 88px)'
+          : isMobile
+          ? 'calc(100vh - 116px)'
+          : 'none',
       }}
       onClick={onFocus}
     >
+      {/* Acrylic Specular Title Bar */}
       <div
-        className={`bg-white/[0.03] border-b border-white/[0.08] px-4 py-2.5 flex justify-between items-center select-none ${
-          isMobile ? '' : 'cursor-move'
+        className={`bg-gradient-to-r from-white/[0.09] via-white/[0.04] to-white/[0.07] border-b border-white/[0.14] px-4 py-3 flex justify-between items-center select-none backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] ${
+          isMobile || isMaximized ? '' : 'cursor-move'
         }`}
         onMouseDown={handleMouseDown}
       >
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-3.5 min-w-0">
+          {/* Traffic Lights Controls */}
+          <div className="flex items-center gap-2">
+            {/* Close Button */}
             <button
               type="button"
-              className="group w-3 h-3 rounded-full bg-rose-500/80 hover:bg-rose-500 border border-white/10 flex items-center justify-center cursor-pointer transition-colors focus:outline-none"
+              className="group w-3.5 h-3.5 rounded-full bg-rose-500/90 hover:bg-rose-500 border border-white/20 flex items-center justify-center cursor-pointer transition-all focus:outline-none shadow-[0_0_8px_rgba(244,63,94,0.4)]"
               onClick={(e) => {
                 e.stopPropagation();
                 onClose();
               }}
+              title="Close (ESC)"
               aria-label="Close window"
             >
-              <span className="text-[8px] leading-none text-black/80 opacity-0 group-hover:opacity-100 font-bold">✕</span>
+              <span className="text-[8px] leading-none text-zinc-950 opacity-0 group-hover:opacity-100 font-bold transition-opacity">
+                ✕
+              </span>
             </button>
-            <span className="w-3 h-3 rounded-full bg-white/[0.10] border border-white/[0.08]" />
-            <span className="w-3 h-3 rounded-full bg-white/[0.10] border border-white/[0.08]" />
+
+            {/* Minimize / Hide Button */}
+            <button
+              type="button"
+              className="group w-3.5 h-3.5 rounded-full bg-amber-400/80 hover:bg-amber-400 border border-white/20 flex items-center justify-center cursor-pointer transition-all focus:outline-none shadow-[0_0_8px_rgba(251,191,36,0.3)]"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              title="Minimize window"
+              aria-label="Minimize window"
+            >
+              <span className="text-[8px] leading-none text-zinc-950 opacity-0 group-hover:opacity-100 font-bold transition-opacity">
+                −
+              </span>
+            </button>
+
+            {/* Maximize / Restore Button */}
+            <button
+              type="button"
+              className="group w-3.5 h-3.5 rounded-full bg-emerald-400/80 hover:bg-emerald-400 border border-white/20 flex items-center justify-center cursor-pointer transition-all focus:outline-none shadow-[0_0_8px_rgba(52,211,153,0.3)]"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMaximized((prev) => !prev);
+              }}
+              title={isMaximized ? 'Restore window' : 'Maximize window'}
+              aria-label="Maximize or restore window"
+            >
+              <span className="text-[7px] leading-none text-zinc-950 opacity-0 group-hover:opacity-100 font-bold transition-opacity">
+                {isMaximized ? '⤦' : '⤢'}
+              </span>
+            </button>
           </div>
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-zinc-500 font-['JetBrains_Mono'] text-xs select-none">τ</span>
-            <span className="font-['JetBrains_Mono'] text-xs sm:text-[13px] font-medium tracking-tight text-zinc-200 truncate">
+
+          {/* Title Pill Badge */}
+          <div className="flex items-center gap-2 min-w-0 bg-white/[0.05] border border-white/[0.12] px-3 py-0.5 rounded-lg backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">
+            <span className="text-zinc-400 font-['JetBrains_Mono'] text-xs select-none">τ</span>
+            <span className="font-['JetBrains_Mono'] text-xs sm:text-[13px] font-medium tracking-tight text-zinc-100 truncate">
               {title}
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          className="text-zinc-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.10] border border-white/[0.08] rounded-md px-2 py-0.5 text-[11px] font-['JetBrains_Mono'] cursor-pointer transition-colors focus:outline-none whitespace-nowrap"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          aria-label="Close terminal window"
-        >
-          ESC
-        </button>
+
+        {/* Right Action / ESC Button */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="text-zinc-300 hover:text-white bg-white/[0.06] hover:bg-white/[0.14] border border-white/[0.14] hover:border-white/30 rounded-lg px-2.5 py-1 text-[11px] font-['JetBrains_Mono'] cursor-pointer transition-all focus:outline-none whitespace-nowrap shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            aria-label="Close terminal window"
+          >
+            ESC
+          </button>
+        </div>
       </div>
+
+      {/* Frosted Window Body */}
       <div
         className="flex-1 overflow-y-auto bg-transparent terminal-style"
         style={{

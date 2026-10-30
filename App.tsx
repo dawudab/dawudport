@@ -16,8 +16,8 @@ import {
   CONTACT_WINDOW_DESKTOP_SIZE
 } from './constants';
 
-const APP_HEADER_HEIGHT = 36; // px for CryptoTickerBar
-const APP_FOOTER_HEIGHT = 38; // px for StatusBar
+const APP_HEADER_HEIGHT = 38; // px for CryptoTickerBar
+const APP_FOOTER_HEIGHT = 42; // px for StatusBar
 const DESKTOP_WINDOW_MARGIN_TOP_FROM_HEADER = 18; // px, min space between header and window top
 const DESKTOP_WINDOW_STAGGER_OFFSET = 26; // px, for staggering multiple windows
 
@@ -208,15 +208,15 @@ const App: React.FC = () => {
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           background:
-            'radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.055) 0%, rgba(148, 163, 184, 0.02) 38%, rgba(5, 5, 7, 0) 72%)',
+            'radial-gradient(ellipse 85% 55% at 50% -10%, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0) 70%), radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.045) 0%, rgba(148, 163, 184, 0.015) 45%, rgba(5, 5, 7, 0) 80%)',
         }}
       />
       <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.035]"
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.04]"
         style={{
           backgroundImage:
-            'linear-gradient(to right, rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.6) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
+            'linear-gradient(to right, rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.7) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
         }}
       />
 

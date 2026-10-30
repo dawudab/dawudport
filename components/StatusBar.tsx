@@ -64,22 +64,22 @@ const StatusBar: React.FC<StatusBarProps> = ({ onOpenWindow }) => {
   const nameButtonFont = isHoveringName ? "font-['Cairo']" : "font-['JetBrains_Mono']";
 
   return (
-    <div className="fixed bottom-0 left-0 w-full h-[38px] bg-zinc-950/60 backdrop-blur-2xl z-[100] border-t border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07)] flex justify-between items-center">
+    <div className="fixed bottom-0 left-0 w-full h-[42px] bg-gradient-to-r from-zinc-950/80 via-zinc-950/65 to-zinc-950/80 backdrop-blur-[36px] z-[100] border-t border-white/[0.18] shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_-10px_35px_rgba(0,0,0,0.6)] flex justify-between items-center">
       {/* Desktop Name Button */}
       <div className="hidden md:flex items-center px-4 shrink-0">
         <button
           type="button"
-          className={`inline-flex items-center gap-2 text-xs font-medium text-zinc-100 cursor-pointer bg-white/[0.05] hover:bg-white/[0.11] border border-white/[0.12] hover:border-white/25 px-3 py-1 rounded-lg transition-all duration-150 whitespace-nowrap shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] ${nameButtonFont}`}
+          className={`inline-flex items-center gap-2 text-xs font-medium text-zinc-100 cursor-pointer bg-white/[0.08] hover:bg-white/[0.16] border border-white/25 hover:border-white/40 px-3.5 py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),0_4px_16px_rgba(0,0,0,0.35)] active:scale-95 ${nameButtonFont}`}
           onMouseEnter={() => setIsHoveringName(true)}
           onMouseLeave={() => setIsHoveringName(false)}
           onClick={() => onOpenWindow(WindowId.INFO)}
         >
           <span className="text-zinc-400 font-['JetBrains_Mono']">τ</span>
-          <span>{nameButtonText}</span>
+          <span className="tracking-tight">{nameButtonText}</span>
         </button>
       </div>
 
-      <div className="hidden md:flex min-w-0 flex-1 items-center overflow-hidden border-x border-white/[0.06] h-full">
+      <div className="hidden md:flex min-w-0 flex-1 items-center overflow-hidden border-x border-white/[0.10] h-full">
         <WorldClock />
       </div>
 
@@ -87,21 +87,21 @@ const StatusBar: React.FC<StatusBarProps> = ({ onOpenWindow }) => {
       <div className="md:hidden flex items-center justify-between w-full h-full px-3">
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 text-xs font-['JetBrains_Mono'] font-medium text-zinc-100 bg-white/[0.05] active:bg-white/[0.12] border border-white/[0.12] px-2.5 py-1 rounded-lg whitespace-nowrap"
+          className="inline-flex items-center gap-1.5 text-xs font-['JetBrains_Mono'] font-medium text-zinc-100 bg-white/[0.08] active:bg-white/[0.16] border border-white/25 px-3 py-1.5 rounded-xl whitespace-nowrap shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]"
           onClick={() => onOpenWindow(WindowId.INFO)}
         >
           <span className="text-zinc-400">τ</span>
           <span>{NAME_MOBILE}</span>
         </button>
 
-        <div className="text-zinc-300 text-xs font-['JetBrains_Mono'] tabular-nums tracking-tight whitespace-nowrap">
+        <div className="text-zinc-300 text-xs font-['JetBrains_Mono'] tabular-nums tracking-tight whitespace-nowrap bg-white/[0.05] border border-white/[0.10] px-2.5 py-1 rounded-lg">
           {currentDate}
         </div>
       </div>
 
       {/* Desktop time display - right aligned */}
       <div className="hidden md:flex items-center h-full px-4">
-        <div className="text-zinc-300 text-xs font-['JetBrains_Mono'] tabular-nums tracking-tight whitespace-nowrap">
+        <div className="text-zinc-300 text-xs font-['JetBrains_Mono'] tabular-nums tracking-tight whitespace-nowrap bg-white/[0.05] border border-white/[0.10] px-3 py-1 rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
           {currentDate}
         </div>
       </div>

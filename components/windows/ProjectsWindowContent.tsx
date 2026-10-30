@@ -12,7 +12,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
   const readableStatus = project.statusText.replace('STATUS_', '').replace(/_/g, ' ');
 
   return (
-    <div className="border border-white/[0.08] bg-white/[0.02] rounded-xl p-4 sm:p-5 transition-all duration-150">
+    <div className="backdrop-blur-xl bg-gradient-to-b from-white/[0.07] to-white/[0.02] border border-white/[0.16] rounded-xl p-4 sm:p-5 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_8px_28px_rgba(0,0,0,0.4)]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
         <div className="flex items-center gap-3">
           <PulsingLight color={project.statusColor} />

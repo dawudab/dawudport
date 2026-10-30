@@ -41,7 +41,7 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow 
           <h2 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2 flex items-center gap-2">
             <span className="text-zinc-600">//</span> 01. About Me
           </h2>
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-zinc-300 space-y-2.5">
+          <div className="backdrop-blur-xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/[0.14] rounded-xl p-4 sm:p-5 text-zinc-300 space-y-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_8px_24px_rgba(0,0,0,0.35)]">
             <p>
               I am <span className="text-white font-medium">Dawud</span> — a developer, tech strategist, and builder based in the United States.
             </p>
@@ -56,7 +56,7 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow 
           <h2 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2 flex items-center gap-2">
             <span className="text-zinc-600">//</span> 02. About This Website
           </h2>
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-zinc-300 space-y-2">
+          <div className="backdrop-blur-xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/[0.14] rounded-xl p-4 sm:p-5 text-zinc-300 space-y-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_8px_24px_rgba(0,0,0,0.35)]">
             <p>
               This website is an interactive desktop operating system modeled after modern Bittensor terminal architecture and iOS frosted glass aesthetics.
             </p>
@@ -71,15 +71,15 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow 
           <h2 className="text-xs uppercase font-semibold tracking-wider text-zinc-400 mb-2 flex items-center gap-2">
             <span className="text-zinc-600">//</span> 03. Quick Launch Directory
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => onOpenWindow(WindowId.PROJECTS)}
-              className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-150 group cursor-pointer"
+              className="text-left p-3.5 rounded-xl backdrop-blur-xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.12] hover:to-white/[0.04] border border-white/[0.14] hover:border-white/30 transition-all duration-200 group cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_6px_20px_rgba(0,0,0,0.35)] active:scale-[0.98]"
             >
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-zinc-400 group-hover:text-white font-medium">./projects</span>
-                <span className="text-emerald-400 text-[11px]">ACTIVE</span>
+                <span className="text-emerald-400 text-[11px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">ACTIVE</span>
               </div>
               <p className="text-xs text-zinc-300 group-hover:text-white">
                 View Nouakchott E-Map & deployment status ›
@@ -89,11 +89,11 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow 
             <button
               type="button"
               onClick={() => onOpenWindow(WindowId.CONTACT)}
-              className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-150 group cursor-pointer"
+              className="text-left p-3.5 rounded-xl backdrop-blur-xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.12] hover:to-white/[0.04] border border-white/[0.14] hover:border-white/30 transition-all duration-200 group cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_6px_20px_rgba(0,0,0,0.35)] active:scale-[0.98]"
             >
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-zinc-400 group-hover:text-white font-medium">./contact</span>
-                <span className="text-zinc-400 text-[11px]">RELAY</span>
+                <span className="text-zinc-300 text-[11px] bg-white/[0.06] border border-white/10 px-2 py-0.5 rounded">RELAY</span>
               </div>
               <p className="text-xs text-zinc-300 group-hover:text-white">
                 Send transmission via Email or WhatsApp ›
@@ -103,11 +103,11 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow 
             <button
               type="button"
               onClick={() => onOpenWindow(WindowId.INFO)}
-              className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-150 group cursor-pointer"
+              className="text-left p-3.5 rounded-xl backdrop-blur-xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-white/[0.12] hover:to-white/[0.04] border border-white/[0.14] hover:border-white/30 transition-all duration-200 group cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_6px_20px_rgba(0,0,0,0.35)] active:scale-[0.98]"
             >
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-zinc-400 group-hover:text-white font-medium">./dawud --info</span>
-                <span className="text-zinc-400 text-[11px]">BIO</span>
+                <span className="text-zinc-300 text-[11px] bg-white/[0.06] border border-white/10 px-2 py-0.5 rounded">BIO</span>
               </div>
               <p className="text-xs text-zinc-300 group-hover:text-white">
                 View bio profile, location, and details ›
@@ -118,11 +118,11 @@ const ReadmeWindowContent: React.FC<ReadmeWindowContentProps> = ({ onOpenWindow 
               href={CONTACT_WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-emerald-500/10 border border-white/[0.08] hover:border-emerald-500/30 transition-all duration-150 group cursor-pointer"
+              className="text-left p-3.5 rounded-xl backdrop-blur-xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] hover:from-emerald-500/15 hover:to-emerald-500/5 border border-white/[0.14] hover:border-emerald-500/40 transition-all duration-200 group cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_6px_20px_rgba(0,0,0,0.35)] active:scale-[0.98]"
             >
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-zinc-400 group-hover:text-emerald-400 font-medium">WhatsApp</span>
-                <span className="text-emerald-400 text-[11px]">DIRECT</span>
+                <span className="text-emerald-400 text-[11px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">DIRECT</span>
               </div>
               <p className="text-xs text-zinc-300 group-hover:text-white">
                 {CONTACT_WHATSAPP_DISPLAY} ↗

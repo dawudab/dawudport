@@ -1,33 +1,10 @@
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { CityTime } from '../types'; // Added
-import { CITIES_FOR_CLOCK } from '@/constants'; // Changed from ../constants
 
 const GlobeCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null); // Changed from osEnvRef to containerRef for clarity
-
-  const [worldClocks, setWorldClocks] = useState<CityTime[]>(CITIES_FOR_CLOCK.map(city => ({...city, currentTime: 'Loading...'})));
-
-  const updateWorldClocks = useCallback(() => {
-    setWorldClocks(prevClocks =>
-      prevClocks.map(city => ({
-        ...city,
-        currentTime: new Date().toLocaleTimeString('en-GB', {
-          timeZone: city.timeZone,
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      }))
-    );
-  }, []);
-
-  useEffect(() => {
-    updateWorldClocks();
-    const clockIntervalId = setInterval(updateWorldClocks, 30000); // Update every 30 seconds
-    return () => clearInterval(clockIntervalId);
-  }, [updateWorldClocks]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
@@ -135,23 +112,6 @@ const GlobeCanvas: React.FC = () => {
   return (
     <div ref={containerRef} className="absolute top-0 left-0 w-full h-full z-[1]">
       <canvas ref={canvasRef} className="w-full h-full" />
-      <div
-        className="absolute bottom-[calc(38px+0.75rem)] left-1/2 -translate-x-1/2 w-full px-4
-                   flex justify-center items-center flex-wrap gap-x-4 gap-y-1 z-[2] pointer-events-none"
-        aria-label="World Times Under Globe"
-      >
-        {worldClocks.map((city, idx) => (
-          <React.Fragment key={city.name}>
-            <span className="text-[11px] font-['JetBrains_Mono'] tabular-nums tracking-tight text-zinc-300/80 whitespace-nowrap">
-              <span className="text-zinc-500">{city.name.toUpperCase()}</span>{' '}
-              <span className="text-zinc-200">{city.currentTime}</span>
-            </span>
-            {idx < worldClocks.length - 1 && (
-              <span className="text-zinc-700 text-[10px] hidden sm:inline" aria-hidden="true">·</span>
-            )}
-          </React.Fragment>
-        ))}
-      </div>
     </div>
   );
 };

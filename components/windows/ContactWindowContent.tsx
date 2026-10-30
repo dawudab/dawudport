@@ -78,11 +78,11 @@ const ContactWindowContent: React.FC = () => {
       {/* Two Direct Contact Cards: WhatsApp & Email */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         {/* WhatsApp Card */}
-        <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-emerald-500/30 transition-all flex flex-col justify-between">
+        <div className="p-4 sm:p-5 rounded-xl backdrop-blur-xl bg-gradient-to-b from-white/[0.07] to-white/[0.02] border border-white/[0.16] hover:border-emerald-500/40 transition-all duration-200 flex flex-col justify-between shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.35)]">
           <div>
             <div className="flex items-center justify-between text-xs mb-1">
               <span className="text-emerald-400 font-semibold tracking-wide">WHATSAPP</span>
-              <span className="text-[11px] text-zinc-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              <span className="text-[11px] text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
                 ACTIVE
               </span>
             </div>
@@ -93,12 +93,12 @@ const ContactWindowContent: React.FC = () => {
               Fastest for direct messaging, voice notes, and project inquiries.
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-white/[0.06]">
+          <div className="mt-4 pt-3 border-t border-white/[0.08]">
             <a
               href={CONTACT_WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-medium py-2 px-3 rounded-lg text-xs transition-colors shadow-[0_4px_16px_rgba(16,185,129,0.2)]"
+              className="inline-flex items-center justify-center gap-1.5 w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-medium py-2 px-3 rounded-lg text-xs transition-colors shadow-[0_4px_16px_rgba(16,185,129,0.25)] active:scale-[0.98]"
             >
               <span>Chat on WhatsApp</span>
               <span aria-hidden="true">↗</span>
@@ -107,11 +107,11 @@ const ContactWindowContent: React.FC = () => {
         </div>
 
         {/* Email Card */}
-        <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-white/20 transition-all flex flex-col justify-between">
+        <div className="p-4 sm:p-5 rounded-xl backdrop-blur-xl bg-gradient-to-b from-white/[0.07] to-white/[0.02] border border-white/[0.16] hover:border-white/35 transition-all duration-200 flex flex-col justify-between shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.35)]">
           <div>
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-zinc-300 font-semibold tracking-wide">SECURE EMAIL</span>
-              <span className="text-[11px] text-zinc-400 bg-white/[0.06] px-2 py-0.5 rounded border border-white/[0.08]">
+              <span className="text-zinc-200 font-semibold tracking-wide">SECURE EMAIL</span>
+              <span className="text-[11px] text-zinc-300 bg-white/[0.08] px-2.5 py-0.5 rounded border border-white/10">
                 INBOX
               </span>
             </div>
@@ -122,10 +122,10 @@ const ContactWindowContent: React.FC = () => {
               Direct email for collaboration, contracts, and proposals.
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center gap-2">
+          <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center gap-2">
             <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className="inline-flex items-center justify-center gap-1.5 flex-1 bg-white hover:bg-zinc-200 text-zinc-950 font-medium py-2 px-3 rounded-lg text-xs transition-colors shadow-[0_4px_16px_rgba(255,255,255,0.15)]"
+              className="inline-flex items-center justify-center gap-1.5 flex-1 bg-white hover:bg-zinc-200 text-zinc-950 font-medium py-2 px-3 rounded-lg text-xs transition-colors shadow-[0_4px_16px_rgba(255,255,255,0.18)] active:scale-[0.98]"
             >
               <span>Send Email</span>
               <span aria-hidden="true">↗</span>
@@ -133,7 +133,7 @@ const ContactWindowContent: React.FC = () => {
             <button
               type="button"
               onClick={copyEmailToClipboard}
-              className="px-3 py-2 bg-white/[0.06] hover:bg-white/[0.12] text-zinc-200 border border-white/[0.08] rounded-lg text-xs transition-colors"
+              className="px-3 py-2 bg-white/[0.08] hover:bg-white/[0.16] text-zinc-200 border border-white/15 rounded-lg text-xs transition-colors active:scale-95"
               title="Copy email address"
             >
               {copiedEmail ? 'Copied' : 'Copy'}
@@ -143,7 +143,7 @@ const ContactWindowContent: React.FC = () => {
       </div>
 
       {/* Embedded Terminal Form */}
-      <div className="border border-white/[0.08] bg-white/[0.02] rounded-xl p-4 sm:p-5 flex-grow">
+      <div className="border border-white/[0.16] backdrop-blur-xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] rounded-xl p-4 sm:p-5 flex-grow shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_8px_24px_rgba(0,0,0,0.35)]">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
