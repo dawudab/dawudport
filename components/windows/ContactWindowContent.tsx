@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, CONTACT_WHATSAPP_DISPLAY, CONTACT_WHATSAPP_URL } from '@
 type FormStatus = 'idle' | 'composing' | 'submitting_data' | 'submitted' | 'error';
 
 // Firebase Cloud Function URL for sending emails
-const CLOUD_FUNCTION_ENDPOINT = 'https://sendemail-p7d44ymx7a-uc.a.run.app';
+const CLOUD_FUNCTION_ENDPOINT = import.meta.env.VITE_CONTACT_FUNCTION_URL || 'https://sendemail-p7d44ymx7a-uc.a.run.app';
 
 const ContactWindowContent: React.FC = () => {
   const [formStatus, setFormStatus] = useState<FormStatus>('idle');

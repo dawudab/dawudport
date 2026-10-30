@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/three": "^0.157.0",
+    "firebase": "^13.1.0",
     "hijri-js": "^1.0.25",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
