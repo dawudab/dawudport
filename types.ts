@@ -1,5 +1,6 @@
-
 import type { SVGProps, JSX } from 'react';
+
+export type ThemeMode = 'dark' | 'light';
 
 export enum WindowId {
   README = 'readme-window',
@@ -20,8 +21,8 @@ export interface WindowInstance {
 
 export interface CryptoCoin {
   id: string;
-  name: string; // e.g., Bitcoin
-  symbol: string; // e.g., BTC
+  name: string;
+  symbol: string;
   usd: number;
   usd_market_cap: number;
   usd_24h_change: number;
@@ -35,7 +36,7 @@ export interface CityTime {
 
 export interface TerminalOption {
   text: string;
-  next?: string; // key for next node in conversationTree
+  next?: string;
   action?: () => void;
 }
 
@@ -74,8 +75,12 @@ export interface Project {
   id: string;
   name: string;
   statusText: string;
-  statusColor: 'green' | 'yellow' | 'red'; // For pulsing light
-  description?: string; // Optional, if needed later
+  statusColor: 'green' | 'yellow' | 'red';
+  description?: string;
+  fullSummary?: string;
+  category?: string;
+  thumbnailUrl?: string;
+  highlights?: string[];
   launchUrl?: string;
   detailsInitiallyOpen?: boolean;
 }
@@ -83,5 +88,5 @@ export interface Project {
 export interface DesktopIconConfig {
   id: WindowId;
   label: string;
-  icon: (props: SVGProps<SVGSVGElement>) => JSX.Element; // Icon component
+  icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
 }
