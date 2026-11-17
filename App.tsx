@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import BootScreen from './components/BootScreen';
+import LoginScreen from './components/LoginScreen';
 import GlobeCanvas from './components/GlobeCanvas';
 import DesktopIconsContainer from './components/DesktopIconsContainer';
 import WindowComponent from './components/Window';
@@ -7,7 +9,7 @@ import ReadmeWindowContent from './components/windows/ReadmeWindowContent';
 import ProjectsWindowContent from './components/windows/ProjectsWindowContent';
 import ContactWindowContent from './components/windows/ContactWindowContent';
 import InfoWindowContent from './components/windows/InfoWindowContent';
-import { WindowId, WindowInstance, ThemeMode } from './types';
+import { WindowId, WindowInstance, OSStage, LoggedInUser } from './types';
 import {
   INITIAL_WINDOW_Z_INDEX,
   DEFAULT_WINDOW_SIZE,
@@ -15,10 +17,10 @@ import {
   CONTACT_WINDOW_DESKTOP_SIZE,
 } from './constants';
 
-const APP_HEADER_HEIGHT = 0; // Top ticker removed for a clean, open 3D desktop canvas
-const APP_FOOTER_HEIGHT = 46; // px for StatusBar
-const DESKTOP_WINDOW_MARGIN_TOP = 24; // px, min space from top viewport edge
-const DESKTOP_WINDOW_STAGGER_OFFSET = 26; // px, for staggering multiple windows
+const APP_HEADER_HEIGHT = 0; // No market ticker bar
+const APP_FOOTER_HEIGHT = 44; // px for StatusBar
+const DESKTOP_WINDOW_MARGIN_TOP = 24;
+const DESKTOP_WINDOW_STAGGER_OFFSET = 24;
 
 const windowDefinitionOrder: WindowId[] = [
   WindowId.README,
@@ -28,10 +30,10 @@ const windowDefinitionOrder: WindowId[] = [
 ];
 
 const windowTitles: Record<WindowId, string> = {
-  [WindowId.README]: './README.md --interactive',
-  [WindowId.PROJECTS]: './projects --status',
-  [WindowId.CONTACT]: './send_transmission --secure',
-  [WindowId.INFO]: './dawud --info',
+  [WindowId.README]: 'README',
+  [WindowId.PROJECTS]: 'Projects',
+  [WindowId.CONTACT]: 'Contact',
+  [WindowId.INFO]: 'L3-OS — System Info',
 };
 
 const calculateWindowLayout = (
@@ -87,8 +89,8 @@ const calculateWindowLayout = (
 };
 
 const App: React.FC = () => {
-  const [theme, setTheme] = useState<ThemeMode>('dark');
-  const [impulseTrigger, setImpulseTrigger] = useState<number>(0);
+  const [osStage, setOsStage] = useState<OSStage>('booting');
+  const [, setLoggedInUser] = useState<LoggedInUser>('User');
 
   const [windows, setWindows] = useState<Record<WindowId, WindowInstance>>(() => {
     const initialViewportWidth = window.innerWidth;
@@ -101,6 +103,7 @@ const App: React.FC = () => {
         id,
         title: windowTitles[id],
         isVisible: false,
+        isMinimized: false,
         zIndex: INITIAL_WINDOW_Z_INDEX,
         position: layout.position,
         size: layout.size,
@@ -113,12 +116,17 @@ const App: React.FC = () => {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [activeWindowId, setActiveWindowId] = useState<WindowId | null>(null);
 
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  const handleBootComplete = useCallback(() => {
+    setOsStage((prev) => (prev === 'booting' ? 'login' : prev));
   }, []);
 
-  const trigger3DPulse = useCallback(() => {
-    setImpulseTrigger((prev) => prev + 1);
+  const handleLogin = useCallback((user: LoggedInUser) => {
+    setLoggedInUser(user);
+    setOsStage('desktop');
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    setOsStage('login');
   }, []);
 
   const updateAllWindowsLayout = useCallback((viewportWidth: number, viewportHeight: number) => {
@@ -149,11 +157,13 @@ const App: React.FC = () => {
       const windowCount = Object.values(prevWindows).filter((w) => w.isVisible).length;
       const layout = calculateWindowLayout(windowId, viewportWidth, viewportHeight, windowCount);
 
+      const existing = prevWindows[windowId];
       newWindows[windowId] = {
-        ...newWindows[windowId],
+        ...existing,
         isVisible: true,
+        isMinimized: false,
         zIndex: newZIndex,
-        position: layout.position,
+        position: existing?.isVisible ? existing.position : layout.position,
         size: layout.size,
         isMaximized: false,
       };
@@ -176,10 +186,14 @@ const App: React.FC = () => {
       const newWindows = { ...prevWindows };
       const maxZIndex = Math.max(...Object.values(prevWindows).map((w) => w.zIndex));
 
-      if (newWindows[windowId] && newWindows[windowId].zIndex < maxZIndex) {
+      if (newWindows[windowId]) {
         newWindows[windowId] = {
           ...newWindows[windowId],
-          zIndex: maxZIndex + 1,
+          isMinimized: false,
+          zIndex:
+            newWindows[windowId].zIndex < maxZIndex
+              ? maxZIndex + 1
+              : newWindows[windowId].zIndex,
         };
       }
 
@@ -188,17 +202,43 @@ const App: React.FC = () => {
     setActiveWindowId(windowId);
   }, []);
 
-  const closeWindow = useCallback(
+  const minimizeWindow = useCallback(
     (id: WindowId) => {
       setWindows((prev) => ({
         ...prev,
-        [id]: { ...prev[id], isVisible: false },
+        [id]: { ...prev[id], isMinimized: true },
       }));
       if (activeWindowId === id) {
         setActiveWindowId(null);
       }
     },
     [activeWindowId]
+  );
+
+  const closeWindow = useCallback(
+    (id: WindowId) => {
+      setWindows((prev) => ({
+        ...prev,
+        [id]: { ...prev[id], isVisible: false, isMinimized: false },
+      }));
+      if (activeWindowId === id) {
+        setActiveWindowId(null);
+      }
+    },
+    [activeWindowId]
+  );
+
+  const handleTaskbarWindowClick = useCallback(
+    (windowId: WindowId) => {
+      const target = windows[windowId];
+      if (!target) return;
+      if (target.isMinimized || activeWindowId !== windowId) {
+        focusWindow(windowId);
+      } else {
+        minimizeWindow(windowId);
+      }
+    },
+    [windows, activeWindowId, focusWindow, minimizeWindow]
   );
 
   const getWindowContent = (id: WindowId) => {
@@ -208,91 +248,79 @@ const App: React.FC = () => {
           <ReadmeWindowContent
             onOpenWindow={openWindow}
             isActive={activeWindowId === WindowId.README}
-            theme={theme}
           />
         );
       case WindowId.PROJECTS:
-        return <ProjectsWindowContent theme={theme} />;
+        return <ProjectsWindowContent />;
       case WindowId.CONTACT:
-        return <ContactWindowContent theme={theme} />;
+        return <ContactWindowContent />;
       case WindowId.INFO:
-        return <InfoWindowContent theme={theme} />;
+        return <InfoWindowContent />;
       default:
         return null;
     }
   };
 
-  const isDark = theme === 'dark';
-
   return (
     <div
       id="os-environment"
-      className={`fixed top-0 left-0 w-screen h-[100dvh] overflow-hidden font-['Plus_Jakarta_Sans'] select-none transition-colors duration-500 ${
-        isDark ? 'bg-[#050507] text-zinc-100' : 'bg-[#eef2f7] text-slate-900'
-      }`}
+      className="fixed top-0 left-0 w-screen h-[100dvh] bg-[#2b4c59] text-[#111827] overflow-hidden font-mono-body select-none"
     >
-      {/* Ambient Radial Light & Architectural Micro-Grid Backdrop */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500"
-        style={{
-          background: isDark
-            ? 'radial-gradient(ellipse 85% 55% at 50% -10%, rgba(56, 189, 248, 0.10) 0%, rgba(255, 255, 255, 0) 70%), radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, rgba(148, 163, 184, 0.015) 45%, rgba(5, 5, 7, 0) 80%)'
-            : 'radial-gradient(ellipse 85% 55% at 50% -10%, rgba(56, 189, 248, 0.18) 0%, rgba(255, 255, 255, 0) 70%), radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.85) 0%, rgba(226, 232, 240, 0.4) 55%, rgba(238, 242, 247, 0) 85%)',
-        }}
-      />
-      <div
-        className={`pointer-events-none absolute inset-0 z-0 ${
-          isDark ? 'opacity-[0.04]' : 'opacity-[0.06]'
-        }`}
-        style={{
-          backgroundImage: isDark
-            ? 'linear-gradient(to right, rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.7) 1px, transparent 1px)'
-            : 'linear-gradient(to right, rgba(15,23,42,0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.5) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
+      {/* Subtle 16-bit Linux Desktop Wallpaper Pixel Dithering */}
+      <div className="pointer-events-none absolute inset-0 z-0 x11-wallpaper-dither" />
 
-      <GlobeCanvas theme={theme} impulseTrigger={impulseTrigger} />
-      <DesktopIconsContainer
-        onIconClick={openWindow}
-        activeWindowId={activeWindowId}
-        theme={theme}
-      />
+      {/* Stage A: Classic Retro Linux Boot Sequence */}
+      {osStage === 'booting' && <BootScreen onBootComplete={handleBootComplete} />}
 
-      <div
-        id="windows-container"
-        className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none"
-      >
-        {(Object.keys(windows) as WindowId[]).map((id) => {
-          const win = windows[id];
-          if (!win) return null;
-          return (
-            <WindowComponent
-              key={win.id}
-              id={win.id}
-              title={win.title}
-              isVisible={win.isVisible}
-              isActive={activeWindowId === win.id}
-              zIndex={win.zIndex}
-              initialPosition={win.position}
-              initialSize={win.size}
-              isMobile={isMobile}
-              theme={theme}
-              onClose={() => closeWindow(win.id)}
-              onFocus={() => focusWindow(win.id)}
-            >
-              {getWindowContent(win.id)}
-            </WindowComponent>
-          );
-        })}
-      </div>
+      {/* Stage B & C share the rotating wireframe globe over the slate-teal desktop wallpaper */}
+      {osStage !== 'booting' && <GlobeCanvas />}
 
-      <StatusBar
-        onOpenWindow={openWindow}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        onTrigger3DPulse={trigger3DPulse}
-      />
+      {/* Stage B: Retro Linux Display Manager / Login Window */}
+      {osStage === 'login' && <LoginScreen onLogin={handleLogin} />}
+
+      {/* Stage C: L3-OS Desktop Environment */}
+      {osStage === 'desktop' && (
+        <>
+          <DesktopIconsContainer onIconClick={openWindow} activeWindowId={activeWindowId} />
+
+          <div
+            id="windows-container"
+            className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none"
+          >
+            {(Object.keys(windows) as WindowId[]).map((id) => {
+              const win = windows[id];
+              if (!win) return null;
+              return (
+                <WindowComponent
+                  key={win.id}
+                  id={win.id}
+                  title={win.title}
+                  isVisible={win.isVisible}
+                  isMinimized={win.isMinimized}
+                  isActive={activeWindowId === win.id}
+                  zIndex={win.zIndex}
+                  initialPosition={win.position}
+                  initialSize={win.size}
+                  isMobile={isMobile}
+                  onClose={() => closeWindow(win.id)}
+                  onMinimize={() => minimizeWindow(win.id)}
+                  onFocus={() => focusWindow(win.id)}
+                >
+                  {getWindowContent(win.id)}
+                </WindowComponent>
+              );
+            })}
+          </div>
+
+          <StatusBar
+            windows={windows}
+            activeWindowId={activeWindowId}
+            onOpenWindow={openWindow}
+            onTaskbarWindowClick={handleTaskbarWindowClick}
+            onLogout={handleLogout}
+          />
+        </>
+      )}
     </div>
   );
 };

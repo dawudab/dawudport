@@ -3,17 +3,17 @@ import { FileTextIcon, FolderIcon, MailIcon } from './components/icons';
 
 export const INITIAL_WINDOW_Z_INDEX = 20;
 
-export const DEFAULT_WINDOW_SIZE = { width: '75vw', height: '55vh' }; // Default for desktop
+export const DEFAULT_WINDOW_SIZE = { width: '76vw', height: '62vh' };
 
 // Specific desktop sizes for certain windows
-export const PROJECTS_WINDOW_DESKTOP_SIZE = { width: '78vw', height: '72vh' };
-export const CONTACT_WINDOW_DESKTOP_SIZE = { width: DEFAULT_WINDOW_SIZE.width, height: '52vh' };
+export const PROJECTS_WINDOW_DESKTOP_SIZE = { width: '84vw', height: '78vh' };
+export const CONTACT_WINDOW_DESKTOP_SIZE = { width: DEFAULT_WINDOW_SIZE.width, height: '58vh' };
 
-export const MOBILE_WINDOW_POSITION = { top: 60 };
-export const MOBILE_WINDOW_SIZE = { width: '90vw', height: '70dvh' };
+export const MOBILE_WINDOW_POSITION = { top: 8 };
+export const MOBILE_WINDOW_SIZE = { width: '96vw', height: '84dvh' };
 
 export const DESKTOP_ICON_CONFIGS: DesktopIconConfig[] = [
-  { id: WindowId.README, label: 'README.md', icon: FileTextIcon },
+  { id: WindowId.README, label: 'README', icon: FileTextIcon },
   { id: WindowId.PROJECTS, label: 'Projects', icon: FolderIcon },
   { id: WindowId.CONTACT, label: 'Contact', icon: MailIcon },
 ];
@@ -68,82 +68,100 @@ export const RESUME_DATA: ResumeData = {
 
 export const PROJECTS_DATA: Project[] = [
   {
-    id: 'osint-news',
-    name: 'OSINT News',
+    id: 'qareeb',
+    name: 'Qareeb',
+    role: 'Co-Developer & Project Manager',
+    roleGroup: 'lead',
     statusText: 'STATUS_LIVE',
     statusColor: 'green',
-    category: 'Media · Open Intelligence',
-    thumbnailUrl: '/src/assets/images/proj_osint_news_1793913613261.jpg',
-    launchUrl: 'https://grnosint.ai.studio/',
-    detailsInitiallyOpen: true,
-    description: 'Stylized independent anonymous news platform.',
-    fullSummary: 'An independent open-source intelligence (OSINT) and anonymous news publishing platform built with a kinetic editorial telemetry interface and verified signal feeds.',
-    highlights: ['Anonymous dispatch feeds', 'Global event radar', 'Stylized editorial typography']
-  },
-  {
-    id: 'trash-bounty',
-    name: 'Trash Bounty Ecosystem',
-    statusText: 'STATUS_LIVE',
-    statusColor: 'green',
-    category: 'Web3 · Civic Charity',
-    thumbnailUrl: '/src/assets/images/proj_trash_bounty_1793913614661.jpg',
-    launchUrl: 'https://nouakchott-trash-bounty.ai.studio/',
-    detailsInitiallyOpen: false,
-    description: 'Decentralized trash bounty system that utilizes global charity.',
-    fullSummary: 'A decentralized environmental cleanup bounty protocol connecting global charitable contributions with verified local sanitation action across Nouakchott neighborhoods.',
-    highlights: ['Geo-verified cleanup bounties', 'Transparent charity treasury', 'Community reward payouts']
+    category: 'Food Platform · Operations & Engineering',
+    launchUrl: 'https://www.qareebfood.com/',
+    description:
+      'Contributed across all aspects of the application, including UI/UX design, software development, company mission and vision, and day-to-day administrative operations.',
   },
   {
     id: 'nouakchott-energy-map',
     name: 'Nouakchott Energy Map',
+    role: 'Creator, Founder, Project Manager & Lead Developer',
+    roleGroup: 'founder',
     statusText: 'STATUS_LIVE',
     statusColor: 'green',
-    category: 'GIS · Infrastructure',
-    thumbnailUrl: '/src/assets/images/proj_energy_map_1793913615834.jpg',
+    category: 'Civic GIS · Utility & Fuel Foresight',
     launchUrl: 'https://emernouk.ai.studio/',
-    detailsInitiallyOpen: false,
-    description: 'Community-based energy report map.',
-    fullSummary: 'Real-time crowdsourced utility and power grid status map for Nouakchott, empowering residents to report outages, voltage stability, and neighborhood restoration timelines.',
-    highlights: ['Live district grid status', 'Community outage reporting', 'Interactive geospatial heatmap']
+    description:
+      'Inspired by living in Nouakchott, this platform empowers the local community with real-time awareness and foresight around power outages and fuel availability—giving residents the tools to stay informed and proactive instead of left waiting. Designed and built the entire website end-to-end.',
+  },
+  {
+    id: 'charity-trash-bounties',
+    name: 'Charity Trash Bounties',
+    role: 'Creator, Founder, Project Manager & Lead Developer',
+    roleGroup: 'founder',
+    statusText: 'STATUS_LIVE',
+    statusColor: 'green',
+    category: 'Civic Sanitation · Charitable Bounties',
+    launchUrl: 'https://nouakchott-trash-bounty.ai.studio/',
+    description:
+      "Conceptualized and engineered a transparent civic sanitation system designed to solve waste management challenges in developing communities—creating a direct loop from charitable donations to local workers' pockets and measurable, real-world results for a cleaner, safer city.",
   },
   {
     id: 'shtreli',
     name: 'Shtreli',
+    role: 'Co-Developer',
+    roleGroup: 'lead',
     statusText: 'STATUS_LIVE',
     statusColor: 'green',
-    category: 'Commerce · Classifieds',
-    thumbnailUrl: '/src/assets/images/proj_shtreli_market_1793913617637.jpg',
+    category: 'E-Commerce · Classifieds Marketplace',
     launchUrl: 'https://www.shterili.com/',
-    detailsInitiallyOpen: false,
-    description: 'E-commerce marketplace for classified ads.',
-    fullSummary: 'A streamlined multi-category classifieds and peer-to-peer e-commerce marketplace engineered for fast local discovery, verified listings, and direct buyer-seller communication.',
-    highlights: ['Multi-category classified ads', 'Mobile-first listing search', 'Direct seller messaging']
+    description:
+      'Assisted with targeted development features and overall project direction.',
   },
   {
-    id: 'arabic-school-nkc',
-    name: 'Arabic School Landing Page',
+    id: 'mahdara-al-andalous',
+    name: 'Mahdara Al-Andalous Al-Ilmiyya',
+    role: 'Web Developer',
+    roleGroup: 'lead',
     statusText: 'STATUS_LIVE',
     statusColor: 'green',
-    category: 'Education · Linguistic Arts',
-    thumbnailUrl: '/src/assets/images/proj_arabic_school_1793913618277.jpg',
+    category: 'Education · Classical Arabic & Sciences',
     launchUrl: 'https://nkcquran.ai.studio/',
-    detailsInitiallyOpen: false,
-    description: 'Arabic school in Nouakchott.',
-    fullSummary: 'Digital enrollment and curriculum portal for classical Arabic and Quranic studies in Nouakchott, connecting international and local students with traditional scholars.',
-    highlights: ['Classical Arabic & Tajweed', 'Structured study tracks', 'Student registration portal']
+    description:
+      'Fully designed and developed the web platform, and continue to handle backend infrastructure and ongoing site management.',
+  },
+  {
+    id: 'global-resistance-network',
+    name: 'Global Resistance Network',
+    role: 'Creator, Founder, Project Manager & Lead Developer',
+    roleGroup: 'founder',
+    statusText: 'STATUS_LIVE',
+    statusColor: 'green',
+    category: 'Independent Media · Global Conflict & Geopolitics',
+    launchUrl: 'https://grnosint.ai.studio/',
+    description:
+      'A passion project built with a friend to track breaking global news, world conflicts, and geopolitics. Designed, developed, and actively manage the entire platform.',
   },
   {
     id: 'islamic-contracts',
     name: 'Islamic Contracts',
+    role: 'Creator, Founder, Project Manager & Lead Developer',
+    roleGroup: 'founder',
+    statusText: 'STATUS_WIP',
+    statusColor: 'yellow',
+    category: 'Islamic Finance · Digital Agreements',
+    launchUrl: 'https://studio--icontractchain.us-central1.hosted.app/',
+    description:
+      'Originally designed and developed for an Islamic finance course; currently an active work-in-progress exploring structured digital Islamic financial agreements.',
+  },
+  {
+    id: 'al-jisr-institute',
+    name: 'Al Jisr Institute',
+    role: 'Lead Developer & Project Management',
+    roleGroup: 'lead',
     statusText: 'STATUS_LIVE',
     statusColor: 'green',
-    category: 'FinTech · Shariah Web3',
-    thumbnailUrl: '/src/assets/images/proj_islamic_contracts_1793913619138.jpg',
-    launchUrl: 'https://studio--icontractchain.us-central1.hosted.app/',
-    detailsInitiallyOpen: false,
-    description: 'Blockchain-based Islamic contract platform.',
-    fullSummary: 'An on-chain financial agreement and smart contract platform structured around authentic Islamic jurisprudence (Fiqh al-Muamalat) for transparent Murabaha, Mudarabah, and Wakalah execution.',
-    highlights: ['Shariah-compliant templates', 'Immutable cryptographic audit', 'Multi-party covenant signing']
+    category: 'Academic Portal · Recruitment & Strategy',
+    launchUrl: 'https://teacher-recruitment.ai.studio/',
+    description:
+      'Designed and developed the web platform while collaborating directly with the founder to shape the business plan and long-term vision.',
   },
 ];
 

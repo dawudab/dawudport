@@ -1,6 +1,8 @@
 import type { SVGProps, JSX } from 'react';
 
-export type ThemeMode = 'dark' | 'light';
+export type OSStage = 'booting' | 'login' | 'desktop';
+
+export type LoggedInUser = 'User' | 'Guest';
 
 export enum WindowId {
   README = 'readme-window',
@@ -13,19 +15,11 @@ export interface WindowInstance {
   id: WindowId;
   title: string;
   isVisible: boolean;
+  isMinimized?: boolean;
   zIndex: number;
-  position: { top: number; left: number }; // Percentage or pixels
-  size: { width: string; height: string }; // Percentage or pixels string
-  isMaximized?: boolean; // For potential future use
-}
-
-export interface CryptoCoin {
-  id: string;
-  name: string;
-  symbol: string;
-  usd: number;
-  usd_market_cap: number;
-  usd_24h_change: number;
+  position: { top: number; left: number };
+  size: { width: string; height: string };
+  isMaximized?: boolean;
 }
 
 export interface CityTime {
@@ -74,15 +68,14 @@ export interface ResumeData {
 export interface Project {
   id: string;
   name: string;
+  role: string;
+  roleGroup: 'founder' | 'lead';
   statusText: string;
   statusColor: 'green' | 'yellow' | 'red';
-  description?: string;
-  fullSummary?: string;
+  description: string;
   category?: string;
   thumbnailUrl?: string;
-  highlights?: string[];
-  launchUrl?: string;
-  detailsInitiallyOpen?: boolean;
+  launchUrl: string;
 }
 
 export interface DesktopIconConfig {

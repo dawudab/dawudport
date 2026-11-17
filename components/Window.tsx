@@ -1,19 +1,20 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { WindowId, ThemeMode } from '../types';
+import { WindowId } from '../types';
 
 interface WindowProps {
   id: WindowId;
   title: string;
   children: React.ReactNode;
   isVisible: boolean;
+  isMinimized?: boolean;
   isActive?: boolean;
   zIndex: number;
   initialPosition: { top: number; left: number };
   initialSize: { width: string; height: string };
   onClose: () => void;
+  onMinimize?: () => void;
   onFocus: () => void;
   isMobile: boolean;
-  theme?: ThemeMode;
 }
 
 const WindowComponent: React.FC<WindowProps> = ({
@@ -21,14 +22,15 @@ const WindowComponent: React.FC<WindowProps> = ({
   title,
   children,
   isVisible,
+  isMinimized = false,
   isActive = false,
   zIndex,
   initialPosition,
   initialSize,
   onClose,
+  onMinimize,
   onFocus,
   isMobile,
-  theme = 'dark',
 }) => {
   const [position, setPosition] = useState(initialPosition);
   const [isDragging, setIsDragging] = useState(false);
@@ -65,11 +67,11 @@ const WindowComponent: React.FC<WindowProps> = ({
 
       const parentRect = windowRef.current.parentElement?.getBoundingClientRect();
       if (parentRect) {
-        newTop = Math.max(0, Math.min(newTop, parentRect.height - windowRef.current.offsetHeight));
+        newTop = Math.max(8, Math.min(newTop, parentRect.height - windowRef.current.offsetHeight - 48));
         newLeft = Math.max(0, Math.min(newLeft, parentRect.width - windowRef.current.offsetWidth));
       }
 
-      setPosition({ top: newTop, left: newLeft });
+      setPosition({ top: Math.round(newTop), left: Math.round(newLeft) });
     },
     [isDragging, isMobile, isMaximized]
   );
@@ -93,115 +95,92 @@ const WindowComponent: React.FC<WindowProps> = ({
     };
   }, [isDragging, handleMouseMove, handleMouseUp, isMobile]);
 
-  if (!isVisible) {
+  if (!isVisible || isMinimized) {
     return null;
   }
 
-  const isDark = theme === 'dark';
-
-  const windowStyle: React.CSSProperties = {
-    top: isMaximized
-      ? '14px'
-      : `${isMobile ? initialPosition.top : position.top}px`,
-    left: isMaximized
-      ? '12px'
-      : isMobile
-      ? `${initialPosition.left}vw`
-      : `${position.left}px`,
-    width: isMaximized ? 'calc(100vw - 24px)' : initialSize.width,
-    height: isMaximized ? 'calc(100vh - 72px)' : initialSize.height,
-    zIndex,
-    position: isMobile || isMaximized ? 'fixed' : 'absolute',
-  };
+  // On mobile viewports (< 768px), dock cleanly inside the safe desktop area (top: 8px, left: 8px, right: 8px, bottom: 52px)
+  const windowStyle: React.CSSProperties = isMobile
+    ? {
+        position: 'fixed',
+        top: '8px',
+        left: '8px',
+        right: '8px',
+        bottom: '52px',
+        width: 'auto',
+        height: 'auto',
+        maxWidth: 'calc(100vw - 16px)',
+        zIndex,
+      }
+    : isMaximized
+    ? {
+        position: 'fixed',
+        top: '8px',
+        left: '8px',
+        right: '8px',
+        bottom: '52px',
+        width: 'auto',
+        height: 'auto',
+        maxWidth: 'calc(100vw - 16px)',
+        zIndex,
+      }
+    : {
+        position: 'absolute',
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        width: initialSize.width,
+        height: initialSize.height,
+        maxWidth: '1220px',
+        zIndex,
+      };
 
   return (
     <div
       ref={windowRef}
       id={id}
-      className={`rounded-2xl backdrop-blur-[36px] transition-all duration-300 flex flex-col min-w-0 min-h-[220px] overflow-hidden pointer-events-auto ${
-        isDark
-          ? isActive
-            ? 'bg-gradient-to-b from-white/[0.10] via-zinc-950/80 to-zinc-950/90 border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),inset_0_0_24px_rgba(255,255,255,0.02),0_32px_90px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)]'
-            : 'bg-gradient-to-b from-white/[0.07] via-zinc-950/75 to-zinc-950/85 border border-white/12 shadow-[inset_0_1px_1px_rgba(255,255,255,0.22),0_20px_50px_rgba(0,0,0,0.65)] opacity-95'
-          : isActive
-          ? 'bg-gradient-to-b from-white/90 via-white/82 to-slate-50/90 border border-slate-900/15 shadow-[inset_0_1px_1px_rgba(255,255,255,1),0_28px_80px_rgba(15,23,42,0.18),0_0_0_1px_rgba(15,23,42,0.05)]'
-          : 'bg-gradient-to-b from-white/80 via-white/75 to-slate-50/82 border border-slate-900/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_16px_40px_rgba(15,23,42,0.12)] opacity-95'
-      }`}
-      style={{
-        ...windowStyle,
-        width: isMaximized
-          ? 'calc(100vw - 24px)'
-          : isMobile
-          ? 'calc(100% - 16px)'
-          : windowStyle.width,
-        height: isMaximized
-          ? 'calc(100vh - 72px)'
-          : isMobile
-          ? 'calc(100vh - 108px)'
-          : windowStyle.height,
-        maxWidth: isMaximized
-          ? 'none'
-          : isMobile
-          ? 'calc(100% - 16px)'
-          : '1160px',
-        left: isMaximized ? '12px' : isMobile ? '8px' : windowStyle.left,
-        top: isMaximized ? '14px' : isMobile ? '48px' : windowStyle.top,
-        maxHeight: isMaximized
-          ? 'calc(100vh - 72px)'
-          : isMobile
-          ? 'calc(100vh - 108px)'
-          : 'none',
-      }}
+      className="rounded-none x11-window-frame p-1 flex flex-col min-w-0 min-h-[200px] max-w-full overflow-hidden pointer-events-auto"
+      style={windowStyle}
       onClick={onFocus}
     >
-      {/* Acrylic Specular Title Bar */}
+      {/* Classic 90s/2000s Linux Navy Title Bar */}
       <div
-        className={`px-4 py-3 flex justify-between items-center select-none backdrop-blur-xl transition-colors duration-300 ${
-          isDark
-            ? 'bg-gradient-to-r from-white/[0.09] via-white/[0.04] to-white/[0.07] border-b border-white/[0.14] shadow-[inset_0_1px_0_rgba(255,255,255,0.28)]'
-            : 'bg-gradient-to-r from-slate-900/[0.04] via-slate-900/[0.02] to-slate-900/[0.04] border-b border-slate-900/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]'
+        className={`px-2.5 py-1 flex justify-between items-center gap-2 select-none shrink-0 ${
+          isActive
+            ? 'bg-gradient-to-r from-[#000080] to-[#1084d0] text-white'
+            : 'bg-gradient-to-r from-[#6b7280] to-[#9ca3af] text-[#e5e7eb]'
         } ${isMobile || isMaximized ? '' : 'cursor-move'}`}
         onMouseDown={handleMouseDown}
       >
-        <div className="flex items-center gap-3.5 min-w-0">
-          {/* Traffic Lights Controls */}
-          <div className="flex items-center gap-2">
-            {/* Close Button */}
-            <button
-              type="button"
-              className="group w-3.5 h-3.5 rounded-full bg-rose-500/90 hover:bg-rose-500 border border-white/20 flex items-center justify-center cursor-pointer transition-all focus:outline-none shadow-[0_0_8px_rgba(244,63,94,0.4)]"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              title="Close (ESC)"
-              aria-label="Close window"
-            >
-              <span className="text-[8px] leading-none text-zinc-950 opacity-0 group-hover:opacity-100 font-bold transition-opacity">
-                ✕
-              </span>
-            </button>
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <span className="inline-block w-3 h-3 bg-[#d4d0c8] border-t border-l border-white border-r border-b border-[#404040] shrink-0" />
+          <span className="font-pixel-ui text-xs font-bold tracking-wide truncate">
+            {title}
+          </span>
+        </div>
 
-            {/* Minimize / Hide Button */}
-            <button
-              type="button"
-              className="group w-3.5 h-3.5 rounded-full bg-amber-400/85 hover:bg-amber-400 border border-white/20 flex items-center justify-center cursor-pointer transition-all focus:outline-none shadow-[0_0_8px_rgba(251,191,36,0.3)]"
-              onClick={(e) => {
-                e.stopPropagation();
+        {/* Tactile 3D Beveled Window Controls (Touch-friendly on mobile) */}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            className="min-w-[36px] min-h-[36px] sm:min-w-[28px] sm:min-h-[28px] px-1.5 x11-btn font-pixel-ui text-xs font-bold leading-none flex items-center justify-center cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onMinimize) {
+                onMinimize();
+              } else {
                 onClose();
-              }}
-              title="Minimize window"
-              aria-label="Minimize window"
-            >
-              <span className="text-[8px] leading-none text-zinc-950 opacity-0 group-hover:opacity-100 font-bold transition-opacity">
-                −
-              </span>
-            </button>
+              }
+            }}
+            title="Minimize window"
+            aria-label="Minimize window"
+          >
+            _
+          </button>
 
-            {/* Maximize / Restore Button */}
+          {!isMobile && (
             <button
               type="button"
-              className="group w-3.5 h-3.5 rounded-full bg-emerald-400/85 hover:bg-emerald-400 border border-white/20 flex items-center justify-center cursor-pointer transition-all focus:outline-none shadow-[0_0_8px_rgba(52,211,153,0.3)]"
+              className="min-w-[28px] min-h-[28px] px-1.5 x11-btn font-pixel-ui text-xs font-bold leading-none flex items-center justify-center cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsMaximized((prev) => !prev);
@@ -209,64 +188,30 @@ const WindowComponent: React.FC<WindowProps> = ({
               title={isMaximized ? 'Restore window' : 'Maximize window'}
               aria-label="Maximize or restore window"
             >
-              <span className="text-[7px] leading-none text-zinc-950 opacity-0 group-hover:opacity-100 font-bold transition-opacity">
-                {isMaximized ? '⤦' : '⤢'}
-              </span>
+              □
             </button>
-          </div>
+          )}
 
-          {/* Title Badge */}
-          <div
-            className={`flex items-center gap-2 min-w-0 px-3 py-0.5 rounded-lg backdrop-blur-md border ${
-              isDark
-                ? 'bg-white/[0.05] border-white/[0.12] shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]'
-                : 'bg-white/70 border-slate-900/[0.10] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]'
-            }`}
-          >
-            <span
-              className={`font-['JetBrains_Mono'] text-xs select-none ${
-                isDark ? 'text-zinc-400' : 'text-slate-500'
-              }`}
-            >
-              τ
-            </span>
-            <span
-              className={`font-['JetBrains_Mono'] text-xs sm:text-[13px] font-medium tracking-tight truncate ${
-                isDark ? 'text-zinc-100' : 'text-slate-800'
-              }`}
-            >
-              {title}
-            </span>
-          </div>
-        </div>
-
-        {/* Right Action / ESC Button */}
-        <div className="flex items-center gap-2">
           <button
             type="button"
-            className={`rounded-lg px-2.5 py-1 text-[11px] font-['JetBrains_Mono'] cursor-pointer transition-all focus:outline-none whitespace-nowrap border ${
-              isDark
-                ? 'text-zinc-300 hover:text-white bg-white/[0.06] hover:bg-white/[0.14] border-white/[0.14] hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]'
-                : 'text-slate-700 hover:text-slate-950 bg-slate-900/[0.05] hover:bg-slate-900/[0.10] border-slate-900/[0.12]'
-            }`}
+            className="min-w-[36px] min-h-[36px] sm:min-w-[28px] sm:min-h-[28px] px-2 x11-btn font-pixel-ui text-xs font-bold leading-none flex items-center justify-center cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               onClose();
             }}
-            aria-label="Close terminal window"
+            title="Close window"
+            aria-label="Close window"
           >
-            ESC
+            [ X ]
           </button>
         </div>
       </div>
 
-      {/* Frosted Window Body */}
+      {/* Sunken Window Content Area */}
       <div
-        className="flex-1 overflow-y-auto bg-transparent terminal-style"
+        className="flex-1 mt-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-[#e5e7eb] x11-inset terminal-style"
         style={{
           WebkitOverflowScrolling: 'touch',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          WebkitTransform: 'translateZ(0)',
         }}
       >
         <div className="h-full">{children}</div>

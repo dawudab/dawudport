@@ -8,18 +8,18 @@ const PulsingLight: React.FC<PulsingLightProps> = ({ color }) => {
   let bgColorClass = '';
   switch (color) {
     case 'green':
-      bgColorClass = 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.55)]';
+      bgColorClass = 'bg-[#16a34a] border-[#14532d]';
       break;
     case 'yellow':
-      bgColorClass = 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.45)]';
+      bgColorClass = 'bg-[#d97706] border-[#78350f]';
       break;
     case 'red':
-      bgColorClass = 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.45)]';
+      bgColorClass = 'bg-[#dc2626] border-[#7f1d1d]';
       break;
   }
 
   return (
-    <span className={`w-2 h-2 rounded-full self-center flex-shrink-0 ${bgColorClass}`} />
+    <span className={`inline-block w-2.5 h-2.5 border self-center flex-shrink-0 ${bgColorClass}`} />
   );
 };
 
