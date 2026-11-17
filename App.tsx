@@ -18,7 +18,7 @@ import {
 } from './constants';
 
 const APP_HEADER_HEIGHT = 0; // No market ticker bar
-const APP_FOOTER_HEIGHT = 44; // px for StatusBar
+const APP_FOOTER_HEIGHT = 40; // px for StatusBar (h-10)
 const DESKTOP_WINDOW_MARGIN_TOP = 24;
 const DESKTOP_WINDOW_STAGGER_OFFSET = 24;
 

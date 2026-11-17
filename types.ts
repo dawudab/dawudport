@@ -73,6 +73,8 @@ export interface Project {
   statusText: string;
   statusColor: 'green' | 'yellow' | 'red';
   description: string;
+  contribution: string;
+  missionGoal: string;
   category?: string;
   thumbnailUrl?: string;
   launchUrl: string;

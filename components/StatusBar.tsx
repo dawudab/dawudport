@@ -31,49 +31,50 @@ const StatusBar: React.FC<StatusBarProps> = ({
     activeWindowId === WindowId.INFO;
 
   return (
-    <div className="fixed bottom-0 left-0 w-full h-[44px] bg-[#c0c0c0] z-[100] border-t-2 border-white shadow-[inset_0_1px_0_#ece9d8] flex items-center justify-between px-2 sm:px-3 gap-2 select-none text-[#111827]">
-      {/* Left: 3D Beveled [ L3-OS ] System Info Button + Compact Active Window Tabs */}
-      <div className="flex items-center gap-1.5 min-w-0 flex-1">
+    <div className="fixed bottom-0 left-0 w-full h-10 bg-[#c0c0c0] z-[100] border-t-2 border-white shadow-[inset_0_1px_0_#ece9d8] flex items-center justify-between px-1.5 sm:px-2.5 gap-1 sm:gap-2 select-none text-[#111827] overflow-hidden">
+      {/* Left: Compact L3-OS System Info Button */}
+      <div className="flex items-center gap-1 shrink-0">
         <button
           type="button"
           onClick={() => onOpenWindow(WindowId.INFO)}
-          className={`min-h-[32px] px-2.5 py-1 font-pixel-ui text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+          className={`min-h-[28px] px-2 py-1 font-pixel-ui text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1 ${
             isInfoActive ? 'x11-btn-depressed text-[#000080]' : 'x11-btn'
           }`}
           title="Open L3-OS System Info"
         >
-          <span className="inline-block w-2.5 h-2.5 bg-[#1e3a5f] shrink-0" />
-          <span>[ L3-OS ]</span>
+          <span className="inline-block w-2 h-2 bg-[#1e3a5f] border border-white/60 shrink-0" />
+          <span>L3-OS</span>
         </button>
 
         <div className="h-5 w-[2px] bg-[#808080] border-r border-white mx-0.5 shrink-0" />
+      </div>
 
-        {/* Compact Open Window Taskbar Buttons */}
-        <div className="flex items-center gap-1 overflow-x-auto min-w-0">
-          {openWindows.map((win) => {
-            const isCurrent = activeWindowId === win.id && !win.isMinimized;
-            return (
-              <button
-                key={win.id}
-                type="button"
-                onClick={() => onTaskbarWindowClick(win.id)}
-                className={`min-h-[32px] px-2.5 py-1 font-pixel-ui text-[11px] cursor-pointer whitespace-nowrap shrink-0 ${
-                  isCurrent ? 'x11-btn-depressed font-bold text-[#000080]' : 'x11-btn'
-                }`}
-              >
-                {WINDOW_SHORT_LABELS[win.id]}
-              </button>
-            );
-          })}
-        </div>
+      {/* Middle: Scrollable/Truncating Open Window Taskbar Tabs */}
+      <div className="flex-1 min-w-0 overflow-x-auto no-scrollbar flex items-center gap-1">
+        {openWindows.map((win) => {
+          const isCurrent = activeWindowId === win.id && !win.isMinimized;
+          return (
+            <button
+              key={win.id}
+              type="button"
+              onClick={() => onTaskbarWindowClick(win.id)}
+              className={`min-h-[28px] px-2 py-1 font-pixel-ui text-[11px] cursor-pointer whitespace-nowrap shrink-0 truncate max-w-[90px] sm:max-w-[140px] ${
+                isCurrent ? 'x11-btn-depressed font-bold text-[#000080]' : 'x11-btn'
+              }`}
+              title={win.title}
+            >
+              {WINDOW_SHORT_LABELS[win.id]}
+            </button>
+          );
+        })}
       </div>
 
       {/* Right: Log Out Button and Digital Clock */}
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <button
           type="button"
           onClick={onLogout}
-          className="min-h-[32px] x11-btn px-2.5 py-1 font-pixel-ui text-[11px] font-bold cursor-pointer whitespace-nowrap shrink-0"
+          className="min-h-[28px] x11-btn px-2 py-1 font-pixel-ui text-[11px] font-bold cursor-pointer whitespace-nowrap shrink-0"
           title="Log Out to L3-OS Login Screen"
         >
           Log Out

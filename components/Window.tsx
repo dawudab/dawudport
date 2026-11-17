@@ -99,14 +99,14 @@ const WindowComponent: React.FC<WindowProps> = ({
     return null;
   }
 
-  // On mobile viewports (< 768px), dock cleanly inside the safe desktop area (top: 8px, left: 8px, right: 8px, bottom: 52px)
+  // On mobile viewports (< 768px), dock cleanly inside the safe desktop area (top: 8px, left: 8px, right: 8px, bottom: 48px)
   const windowStyle: React.CSSProperties = isMobile
     ? {
         position: 'fixed',
         top: '8px',
         left: '8px',
         right: '8px',
-        bottom: '52px',
+        bottom: '48px',
         width: 'auto',
         height: 'auto',
         maxWidth: 'calc(100vw - 16px)',
@@ -118,7 +118,7 @@ const WindowComponent: React.FC<WindowProps> = ({
         top: '8px',
         left: '8px',
         right: '8px',
-        bottom: '52px',
+        bottom: '48px',
         width: 'auto',
         height: 'auto',
         maxWidth: 'calc(100vw - 16px)',

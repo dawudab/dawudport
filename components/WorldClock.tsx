@@ -21,7 +21,7 @@ const WorldClock: React.FC = () => {
   return (
     <div
       id="world-clock-container"
-      className="x11-inset bg-[#e5e7eb] px-2.5 py-1 font-mono-body text-xs text-[#111827] tabular-nums whitespace-nowrap shrink-0"
+      className="x11-inset bg-[#e5e7eb] px-2 py-1 font-mono-body text-[11px] sm:text-xs text-[#111827] tabular-nums whitespace-nowrap shrink-0"
       title="System Clock"
     >
       {currentTime}

@@ -78,6 +78,10 @@ export const PROJECTS_DATA: Project[] = [
     launchUrl: 'https://www.qareebfood.com/',
     description:
       'Contributed across all aspects of the application, including UI/UX design, software development, company mission and vision, and day-to-day administrative operations.',
+    contribution:
+      'Co-developed the full-stack mobile-first ordering and dispatch workflow, designed the customer and vendor UI/UX, and managed day-to-day operational rollout and driver logistics in Nouakchott.',
+    missionGoal:
+      'Connect local restaurants, grocery stores, and bakeries in Mauritania directly with neighborhood customers through reliable express delivery and seamless local digital payments (Bankily).',
   },
   {
     id: 'nouakchott-energy-map',
@@ -90,6 +94,10 @@ export const PROJECTS_DATA: Project[] = [
     launchUrl: 'https://emernouk.ai.studio/',
     description:
       'Inspired by living in Nouakchott, this platform empowers the local community with real-time awareness and foresight around power outages and fuel availability—giving residents the tools to stay informed and proactive instead of left waiting. Designed and built the entire website end-to-end.',
+    contribution:
+      'Conceived, architected, and built the entire bilingual GIS web platform end-to-end, including the interactive district grid map, real-time citizen outage reporting flow, and time-synced theme engine.',
+    missionGoal:
+      'Empower Nouakchott residents with real-time crowdsourced awareness and foresight around neighborhood electricity outages and fuel availability so families and businesses can plan proactively.',
   },
   {
     id: 'charity-trash-bounties',
@@ -102,6 +110,10 @@ export const PROJECTS_DATA: Project[] = [
     launchUrl: 'https://nouakchott-trash-bounty.ai.studio/',
     description:
       "Conceptualized and engineered a transparent civic sanitation system designed to solve waste management challenges in developing communities—creating a direct loop from charitable donations to local workers' pockets and measurable, real-world results for a cleaner, safer city.",
+    contribution:
+      'Designed the civic bounty protocol from the ground up, engineered the geo-tagged bounty creation and cleanup verification dashboard, and led project strategy.',
+    missionGoal:
+      'Transform urban sanitation in developing cities by turning global Sadaqah and Zakat donations into verifiable cleanup bounties that pay local sanitation workers directly for measurable results.',
   },
   {
     id: 'shtreli',
@@ -114,6 +126,10 @@ export const PROJECTS_DATA: Project[] = [
     launchUrl: 'https://www.shterili.com/',
     description:
       'Assisted with targeted development features and overall project direction.',
+    contribution:
+      'Implemented core marketplace listing features, multi-category search and filtering flows, and contributed to technical architecture and product direction.',
+    missionGoal:
+      'Provide a fast, trusted peer-to-peer classifieds and e-commerce marketplace for local buyers and sellers to trade vehicles, electronics, property, and everyday goods.',
   },
   {
     id: 'mahdara-al-andalous',
@@ -126,6 +142,10 @@ export const PROJECTS_DATA: Project[] = [
     launchUrl: 'https://nkcquran.ai.studio/',
     description:
       'Fully designed and developed the web platform, and continue to handle backend infrastructure and ongoing site management.',
+    contribution:
+      'Designed and developed the complete academic web portal, structured the digital curriculum presentation and enrollment flows, and maintain backend infrastructure.',
+    missionGoal:
+      'Bridge traditional Mauritanian Mahdara scholarship with modern digital access, enabling students locally and worldwide to study Classical Arabic, Qur’an, and Islamic sciences.',
   },
   {
     id: 'global-resistance-network',
@@ -138,6 +158,10 @@ export const PROJECTS_DATA: Project[] = [
     launchUrl: 'https://grnosint.ai.studio/',
     description:
       'A passion project built with a friend to track breaking global news, world conflicts, and geopolitics. Designed, developed, and actively manage the entire platform.',
+    contribution:
+      'Architected and developed the entire 3D globe OSINT telemetry interface, real-time breaking dispatch feeds, and autonomous multi-source signal aggregation pipeline.',
+    missionGoal:
+      'Deliver decentralized, uncensored frontline open-source intelligence (OSINT) and real-time geopolitical conflict tracking through an interactive global radar.',
   },
   {
     id: 'islamic-contracts',
@@ -150,6 +174,10 @@ export const PROJECTS_DATA: Project[] = [
     launchUrl: 'https://studio--icontractchain.us-central1.hosted.app/',
     description:
       'Originally designed and developed for an Islamic finance course; currently an active work-in-progress exploring structured digital Islamic financial agreements.',
+    contribution:
+      'Designed and built the iContractChain web application, translating classical Fiqh al-Muamalat financial instruments into guided smart-contract templates and verification steps.',
+    missionGoal:
+      'Bring transparent, Shariah-compliant financial agreements (Murabaha, Mudarabah, Musharakah) onto digital ledger infrastructure with zero riba and verifiable asset backing.',
   },
   {
     id: 'al-jisr-institute',
@@ -162,6 +190,10 @@ export const PROJECTS_DATA: Project[] = [
     launchUrl: 'https://teacher-recruitment.ai.studio/',
     description:
       'Designed and developed the web platform while collaborating directly with the founder to shape the business plan and long-term vision.',
+    contribution:
+      'Engineered the bilingual academic and faculty recruitment portal end-to-end while collaborating directly with the founder on institutional strategy and operations.',
+    missionGoal:
+      'Build an educational and cultural bridge between Arabic and English speakers by recruiting top bilingual educators and pairing them with dedicated learners.',
   },
 ];
 
